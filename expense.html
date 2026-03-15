@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Log Expense | Budget-Wise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00ff88",
+                        "coral": "#ff7f50",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#0a0f0d",
+                        "obsidian": "#050807",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                    animation: {
+                        'fade-up': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fill-gauge': 'fillGauge 1.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fillGauge: {
+                            '0%': { transform: 'rotate(45deg)' },
+                            '100%': { transform: 'rotate(135deg)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .coral-glow {
+            box-shadow: 0 -10px 40px -10px rgba(255, 127, 80, 0.15);
+        }
+        .gauge-container {
+            position: relative;
+            width: 200px;
+            height: 100px;
+            overflow: hidden;
+        }
+        .gauge-body {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 20px solid rgba(0, 255, 136, 0.1);
+            border-bottom-color: transparent;
+            border-right-color: transparent;
+            transform: rotate(45deg);
+        }
+        .gauge-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 20px solid #00ff88;
+            border-bottom-color: transparent;
+            border-right-color: transparent;
+            transform: rotate(45deg); /* Start empty, config animation will rotate it to 135deg */
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 127, 80, 0.4); /* Coral color */
+        }
+        
+        /* Utility classes for animation delays */
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        
+        /* Hide element initially for fade-up animation */
+        .animate-fade-up {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-obsidian text-slate-100 font-display min-h-screen custom-scrollbar selection:bg-coral selection:text-obsidian">
+<div class="max-w-5xl mx-auto px-6 py-8">
+<!-- Top Navigation (Updated to match Income page style) -->
+<header class="flex items-center justify-between mb-12 glass px-6 py-4 rounded-3xl sticky top-4 z-50 animate-fade-up">
+<div class="flex items-center gap-3 group cursor-pointer" onclick="window.location.href='index.html'">
+<div class="size-9 bg-primary/20 rounded-lg flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-background-dark transition-all duration-300 shadow-[0_0_15px_rgba(0,255,136,0.2)] group-hover:shadow-[0_0_20px_rgba(0,255,136,0.4)]">
+<span class="material-symbols-outlined font-bold group-hover:scale-110 transition-transform">account_balance_wallet</span>
+</div>
+<h2 class="text-xl font-extrabold tracking-tight text-white group-hover:text-primary transition-colors">Budget<span class="text-primary group-hover:text-white transition-colors">-Wise</span></h2>
+</div>
+<div class="flex items-center gap-4">
+<nav class="hidden md:flex items-center gap-1 mr-6">
+<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="index.html">Dashboard</a>
+<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="income.html">Income</a>
+<a class="px-4 py-2 text-sm font-medium text-coral bg-coral/10 rounded-lg shadow-[0_0_10px_rgba(255,127,80,0.1)]" href="expense.html">Expenses</a>
+</nav>
+<button class="size-10 flex items-center justify-center rounded-xl glass hover:bg-white/10 hover:text-coral transition-all group">
+<span class="material-symbols-outlined text-slate-300 group-hover:text-coral transition-colors">notifications</span>
+</button>
+<div class="size-10 rounded-full border-2 border-coral/30 p-0.5 hover:border-coral transition-colors cursor-pointer shadow-[0_0_10px_rgba(255,127,80,0.1)] hover:shadow-[0_0_15px_rgba(255,127,80,0.3)] group">
+<div class="w-full h-full rounded-full bg-obsidian flex items-center justify-center text-coral group-hover:bg-coral group-hover:text-obsidian transition-colors">
+<span class="material-symbols-outlined font-bold text-sm">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Hero: Budget Health Gauge -->
+<section class="flex flex-col items-center justify-center mb-16 py-10 bg-gradient-to-b from-primary/5 to-transparent rounded-3xl border border-white/5 animate-fade-up delay-100">
+<div class="gauge-container mb-4">
+<div class="gauge-body"></div>
+<div class="gauge-fill animate-fill-gauge delay-300"></div>
+<div class="absolute inset-0 flex flex-col items-center justify-end pb-2">
+<span class="text-3xl font-bold text-white leading-none">50%</span>
+<span class="text-[10px] uppercase tracking-widest text-primary font-bold drop-shadow-[0_0_8px_rgba(0,255,136,0.3)]">Health</span>
+</div>
+</div>
+<div class="text-center">
+<h2 class="text-xl font-semibold text-white tracking-tight">Budget Stability: Excellent</h2>
+<p class="text-slate-400 text-sm mt-1">KSH 25,000 of KSH 50,000 monthly limit used</p>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 relative">
+<!-- Left Column: Log Expense Form -->
+<div class="lg:col-span-5 animate-fade-up delay-200">
+<div class="glass coral-glow rounded-3xl p-8 sticky top-32 group/card hover:border-coral/30 transition-colors duration-500 hover:shadow-[0_0_40px_rgba(255,127,80,0.15)] relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-coral to-transparent opacity-50 group-hover/card:opacity-100 transition-opacity duration-500 shadow-[0_5px_15px_rgba(255,127,80,0.5)]"></div>
+<div class="flex items-center gap-2 mb-8 relative z-10">
+<span class="material-symbols-outlined text-coral drop-shadow-[0_0_8px_rgba(255,127,80,0.5)]">add_circle</span>
+<h3 class="text-xl font-bold text-white tracking-tight">Log New Expense</h3>
+</div>
+<form class="space-y-6 relative z-10">
+<div class="space-y-2 group/input">
+<label class="text-sm font-medium text-slate-400 ml-1 group-focus-within/input:text-coral transition-colors tracking-wide">Description</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:bg-white/10 focus:ring-0 focus:border-coral/50 outline-none text-white transition-all duration-300 focus:shadow-[0_0_15px_rgba(255,127,80,0.15)]" placeholder="e.g. Weekly Grocery Run" type="text"/>
+</div>
+<div class="space-y-2 group/amount">
+<label class="text-sm font-medium text-slate-400 ml-1 group-focus-within/amount:text-coral transition-colors tracking-wide">Amount (KSH)</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:bg-white/10 focus:ring-0 focus:border-coral/50 outline-none text-white transition-all duration-300 focus:shadow-[0_0_15px_rgba(255,127,80,0.15)] font-mono text-lg" placeholder="0.00" type="number"/>
+</div>
+<div class="space-y-3">
+<label class="text-sm font-medium text-slate-400 ml-1 tracking-wide">Category</label>
+<div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar custom-scrollbar">
+<button class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full bg-coral/20 text-coral border border-coral/30 text-sm font-medium shadow-[0_0_15px_rgba(255,127,80,0.15)] transition-all hover:bg-coral/30" type="button">
+<span class="material-symbols-outlined text-lg">home</span> Home
+                                </button>
+<button class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/5 text-slate-300 border border-white/10 text-sm font-medium hover:bg-white/10 hover:text-white transition-all group" type="button">
+<span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">shopping_cart</span> Shopping
+                                </button>
+<button class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/5 text-slate-300 border border-white/10 text-sm font-medium hover:bg-white/10 hover:text-white transition-all group" type="button">
+<span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">restaurant</span> Food
+                                </button>
+<button class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/5 text-slate-300 border border-white/10 text-sm font-medium hover:bg-white/10 hover:text-white transition-all group" type="button">
+<span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">directions_car</span> Transport
+                                </button>
+</div>
+</div>
+<div class="space-y-2 group/date">
+<label class="text-sm font-medium text-slate-400 ml-1 group-focus-within/date:text-coral transition-colors tracking-wide">Date</label>
+<div class="relative">
+<input class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:bg-white/10 focus:ring-0 focus:border-coral/50 outline-none text-white transition-all duration-300 focus:shadow-[0_0_15px_rgba(255,127,80,0.15)] [color-scheme:dark]" type="date" value="2023-10-24"/>
+</div>
+</div>
+<button class="w-full bg-gradient-to-r from-orange-500 to-coral text-obsidian font-extrabold text-lg py-4 rounded-xl shadow-[0_10px_30px_-10px_rgba(255,127,80,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(255,127,80,0.6)] hover:-translate-y-1 transition-all duration-300 active:scale-[0.98] mt-4 flex justify-center items-center gap-2">
+<span class="material-symbols-outlined font-bold">payments</span> Save Expense
+                        </button>
+</form>
+</div>
+</div>
+<!-- Right Column: Recent Expenses -->
+<div class="lg:col-span-7 space-y-6 animate-fade-up delay-300">
+<div class="flex items-center justify-between mb-4 px-2">
+<h3 class="text-xl font-bold text-white tracking-tight">Recent Transactions</h3>
+<button class="text-primary text-sm font-semibold hover:underline flex items-center gap-1 group">View All <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span></button>
+</div>
+<!-- Transaction Rows -->
+<div class="space-y-3">
+<div class="glass flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer group/row hover:shadow-[inset_4px_0_0_0_rgba(255,127,80,0.8)] border border-transparent hover:border-white/5">
+<div class="flex items-center gap-4 group-hover/row:translate-x-2 transition-transform duration-300">
+<div class="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover/row:bg-primary/20 transition-colors shadow-[0_0_10px_rgba(0,255,136,0.1)]">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div>
+<p class="text-white font-semibold tracking-wide">Zucchini Groceries</p>
+<p class="text-slate-500 text-xs uppercase tracking-wider font-bold">Shopping • Today</p>
+</div>
+</div>
+<div class="text-right flex items-center gap-3">
+<p class="text-coral font-bold font-mono text-lg">KSH 4,200</p>
+<span class="material-symbols-outlined text-slate-600 group-hover/row:text-coral transition-colors">chevron_right</span>
+</div>
+</div>
+<div class="glass flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer group/row hover:shadow-[inset_4px_0_0_0_rgba(255,127,80,0.8)] border border-transparent hover:border-white/5">
+<div class="flex items-center gap-4 group-hover/row:translate-x-2 transition-transform duration-300">
+<div class="size-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover/row:bg-blue-500/20 transition-colors shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+<span class="material-symbols-outlined">lightbulb</span>
+</div>
+<div>
+<p class="text-white font-semibold tracking-wide">KPLC Token</p>
+<p class="text-slate-500 text-xs uppercase tracking-wider font-bold">Home • Yesterday</p>
+</div>
+</div>
+<div class="text-right flex items-center gap-3">
+<p class="text-coral font-bold font-mono text-lg">KSH 2,500</p>
+<span class="material-symbols-outlined text-slate-600 group-hover/row:text-coral transition-colors">chevron_right</span>
+</div>
+</div>
+<div class="glass flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer group/row hover:shadow-[inset_4px_0_0_0_rgba(255,127,80,0.8)] border border-transparent hover:border-white/5">
+<div class="flex items-center gap-4 group-hover/row:translate-x-2 transition-transform duration-300">
+<div class="size-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover/row:bg-orange-500/20 transition-colors shadow-[0_0_10px_rgba(249,115,22,0.1)]">
+<span class="material-symbols-outlined">directions_car</span>
+</div>
+<div>
+<p class="text-white font-semibold tracking-wide">Uber Trip</p>
+<p class="text-slate-500 text-xs uppercase tracking-wider font-bold">Transport • 22 Oct</p>
+</div>
+</div>
+<div class="text-right flex items-center gap-3">
+<p class="text-coral font-bold font-mono text-lg">KSH 850</p>
+<span class="material-symbols-outlined text-slate-600 group-hover/row:text-coral transition-colors">chevron_right</span>
+</div>
+</div>
+<div class="glass flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer group/row hover:shadow-[inset_4px_0_0_0_rgba(255,127,80,0.8)] border border-transparent hover:border-white/5">
+<div class="flex items-center gap-4 group-hover/row:translate-x-2 transition-transform duration-300">
+<div class="size-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover/row:bg-purple-500/20 transition-colors shadow-[0_0_10px_rgba(168,85,247,0.1)]">
+<span class="material-symbols-outlined">movie</span>
+</div>
+<div>
+<p class="text-white font-semibold tracking-wide">Netflix Subscription</p>
+<p class="text-slate-500 text-xs uppercase tracking-wider font-bold">Entertainment • 20 Oct</p>
+</div>
+</div>
+<div class="text-right flex items-center gap-3">
+<p class="text-coral font-bold font-mono text-lg">KSH 1,100</p>
+<span class="material-symbols-outlined text-slate-600 group-hover/row:text-coral transition-colors">chevron_right</span>
+</div>
+</div>
+<div class="glass flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer group/row hover:shadow-[inset_4px_0_0_0_rgba(255,127,80,0.8)] border border-transparent hover:border-white/5">
+<div class="flex items-center gap-4 group-hover/row:translate-x-2 transition-transform duration-300">
+<div class="size-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-400 group-hover/row:bg-green-500/20 transition-colors shadow-[0_0_10px_rgba(34,197,94,0.1)]">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<p class="text-white font-semibold tracking-wide">Java House Lunch</p>
+<p class="text-slate-500 text-xs uppercase tracking-wider font-bold">Food • 18 Oct</p>
+</div>
+</div>
+<div class="text-right flex items-center gap-3">
+<p class="text-coral font-bold font-mono text-lg">KSH 1,850</p>
+<span class="material-symbols-outlined text-slate-600 group-hover/row:text-coral transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Monthly Summary Card -->
+<div class="glass rounded-3xl p-6 bg-gradient-to-br from-white/5 to-primary/5 hover:border-primary/30 transition-colors duration-500 relative overflow-hidden group/summary cursor-pointer">
+<div class="absolute -right-8 -top-8 w-32 h-32 bg-primary/10 rounded-full group-hover/summary:bg-primary/20 transition-all blur-2xl duration-700 group-hover/summary:scale-150"></div>
+<div class="flex justify-between items-center relative z-10">
+<div>
+<p class="text-slate-400 text-sm font-medium tracking-wide">Projected End Balance</p>
+<p class="text-3xl font-extrabold text-white font-mono mt-1">KSH 12,450</p>
+</div>
+<div class="text-right">
+<p class="text-primary text-sm font-bold bg-primary/10 px-2 py-1 rounded inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">trending_up</span> +12% from last month</p>
+<div class="h-1.5 w-32 bg-white/10 rounded-full mt-3 overflow-hidden ml-auto">
+<div class="h-full bg-primary rounded-full drop-shadow-[0_0_8px_rgba(0,255,136,0.5)] transition-all duration-1000 ease-out" style="width: 0%; animation: fillBar 1.5s ease-out 0.5s forwards;"></div>
+<style>@keyframes fillBar { to { width: 65%; } }</style>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>
