@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Log Income | Budget-Wise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00ff88",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#050a08", // Darker obsidian
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                    animation: {
+                        'fade-up': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'float-slow': 'floatSlow 15s ease-in-out infinite',
+                        'float-slower': 'floatSlow 20s ease-in-out infinite reverse',
+                    },
+                    keyframes: {
+                        fadeUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        floatSlow: {
+                            '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .emerald-glow {
+            box-shadow: 0 -20px 50px -10px rgba(0, 255, 136, 0.15);
+        }
+        .bg-noise {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 136, 0.4); /* Primary color */
+        }
+        
+        /* Utility classes for animation delays */
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-400 { animation-delay: 400ms; }
+        
+        /* Hide element initially for fade-up animation */
+        .animate-fade-up {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-background-dark font-display text-slate-100 min-h-screen relative overflow-x-hidden selection:bg-primary selection:text-background-dark custom-scrollbar scroll-smooth">
+<!-- Background Decor -->
+<div class="fixed inset-0 bg-noise pointer-events-none z-0"></div>
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full pointer-events-none z-0 animate-float-slow"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-teal-900/20 blur-[150px] rounded-full pointer-events-none z-0 animate-float-slower"></div>
+<div class="relative z-10 flex flex-col min-h-screen">
+<!-- Navigation -->
+<header class="flex items-center justify-between px-6 py-4 border-b border-white/5 glass sticky top-0 z-50 animate-fade-up">
+<div class="flex items-center gap-3 group cursor-pointer" onclick="window.location.href='index.html'">
+<div class="size-9 bg-primary/20 rounded-lg flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-background-dark transition-all duration-300 shadow-[0_0_15px_rgba(0,255,136,0.2)] group-hover:shadow-[0_0_20px_rgba(0,255,136,0.4)]">
+<span class="material-symbols-outlined font-bold group-hover:scale-110 transition-transform">account_balance_wallet</span>
+</div>
+<h2 class="text-xl font-extrabold tracking-tight text-white group-hover:text-primary transition-colors">Budget<span class="text-primary group-hover:text-white transition-colors">-Wise</span></h2>
+</div>
+<div class="flex items-center gap-4">
+<nav class="hidden md:flex items-center gap-1 mr-6">
+<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="index.html">Dashboard</a>
+<a class="px-4 py-2 text-sm font-medium text-primary bg-primary/10 rounded-lg shadow-[0_0_10px_rgba(0,255,136,0.1)]" href="income.html">Income</a>
+<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all group flex items-center gap-1" href="#"><span class="material-symbols-outlined text-[16px] group-hover:text-primary transition-colors">arrow_downward</span> Expenses</a>
+</nav>
+<button class="size-10 flex items-center justify-center rounded-xl glass hover:bg-white/10 hover:text-primary transition-all group">
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">notifications</span>
+</button>
+<div class="size-10 rounded-full border-2 border-primary/30 p-0.5 hover:border-primary transition-colors cursor-pointer shadow-[0_0_10px_rgba(0,255,136,0.1)] hover:shadow-[0_0_15px_rgba(0,255,136,0.3)] group">
+<img alt="User Profile" class="rounded-full w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Professional male portrait avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUwYgviXE9SrOyZCOzmjoKyZk2eucIi9m8ExVM44fGLCgyfgZg8LezTn9WViRYixoJ5p2YUXlw6oRz7xtYR3he5Aq3wCY4X_FSiYzalRrAg7hnLWEyyraOWKvHsWPbAPVHSH1Ze9OABAW-M9T8eesJ00qn3G33S_rw0nthd66LgW-HkQFxBBm5LGvlyjRRwdhlX2f5hUh2sPOpJRmjeKGimAjkUAdU7Y3WHCCtN7lAYrMAw5DIr7ep6OohTYQ1YyE107SQyC00rLe2"/>
+</div>
+</div>
+</header>
+<main class="flex-1 max-w-4xl mx-auto w-full px-6 py-12">
+<!-- Header Section -->
+<div class="text-center mb-10 animate-fade-up delay-100">
+<h1 class="text-4xl font-bold text-white mb-2 tracking-tight">Log Income</h1>
+<p class="text-slate-400 tracking-wide">Track your earnings and automate your savings split</p>
+</div>
+<!-- Main Form Card -->
+<div class="glass emerald-glow rounded-3xl p-8 mb-12 relative overflow-hidden animate-fade-up delay-200 group/card hover:border-primary/30 transition-colors duration-500">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 group-hover/card:opacity-100 transition-opacity duration-500 shadow-[0_5px_15px_rgba(0,255,136,0.5)]"></div>
+<form class="space-y-8 relative z-10">
+<!-- Amount Input (JetBrains Mono) -->
+<div class="space-y-2 group/input">
+<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1 group-focus-within/input:text-primary transition-colors">Amount (KSH)</label>
+<div class="relative flex items-center">
+<span class="absolute left-6 text-2xl font-mono text-primary/50 group-focus-within/input:text-primary transition-colors duration-300">KSH</span>
+<input class="w-full bg-white/5 border border-transparent rounded-2xl py-8 pl-24 pr-6 text-5xl font-mono text-white focus:bg-white/10 focus:border-primary/50 focus:ring-0 placeholder:text-white/10 transition-all duration-300 focus:shadow-[0_0_20px_rgba(0,255,136,0.1)]" placeholder="0.00" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Source -->
+<div class="space-y-2 group/source">
+<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1 group-focus-within/source:text-primary transition-colors">Income Source</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/source:text-primary transition-colors duration-300">work</span>
+<input class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:bg-white/10 focus:border-primary/50 focus:ring-0 transition-all duration-300 focus:shadow-[0_0_15px_rgba(0,255,136,0.1)]" placeholder="e.g. Monthly Salary" type="text"/>
+</div>
+</div>
+<!-- Date -->
+<div class="space-y-2 group/date">
+<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1 group-focus-within/date:text-primary transition-colors">Received Date</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/date:text-primary transition-colors duration-300">calendar_today</span>
+<input class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:bg-white/10 focus:border-primary/50 focus:ring-0 transition-all duration-300 [color-scheme:dark] focus:shadow-[0_0_15px_rgba(0,255,136,0.1)]" type="date"/>
+</div>
+</div>
+</div>
+<!-- Split Configuration Visualizer (Subtle) -->
+<div class="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex items-center justify-between hover:bg-primary/10 transition-colors cursor-pointer group/split">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 p-2 rounded-lg group-hover/split:bg-primary group-hover/split:bg-opacity-30 transition-colors">
+<span class="material-symbols-outlined text-primary group-hover/split:animate-[spin_3s_linear_infinite]">auto_awesome</span>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-200 group-hover/split:text-white transition-colors">Smart Split Active</p>
+<p class="text-xs text-slate-400">50% Needs, 30% Wants, 20% Savings</p>
+</div>
+</div>
+<button class="text-xs font-bold text-primary hover:text-white hover:bg-primary/20 px-3 py-1.5 rounded-lg transition-all uppercase tracking-wider border border-transparent hover:border-primary/30" type="button">Customize</button>
+</div>
+<!-- Action Button -->
+<button class="w-full py-5 bg-gradient-to-r from-emerald-500 to-primary rounded-2xl text-background-dark font-extrabold text-lg shadow-[0_10px_30px_-10px_rgba(0,255,136,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(0,255,136,0.6)] hover:-translate-y-1 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined font-bold">add_circle</span> Split &amp; Log Income
+                    </button>
+</form>
+</div>
+<!-- History Table -->
+<div class="space-y-6 animate-fade-up delay-300">
+<div class="flex items-center justify-between px-2">
+<h3 class="text-xl font-bold text-white tracking-tight">Recent Income</h3>
+<button class="text-sm font-medium text-slate-400 hover:text-primary transition-colors flex items-center gap-1 group">
+                        View Full History <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-hidden rounded-2xl border border-white/5 glass">
+<table class="w-full border-collapse">
+<thead class="bg-white/5 border-b border-white/5">
+<tr>
+<th class="text-left py-5 px-6 text-xs font-bold uppercase tracking-widest text-slate-500">Source / Date</th>
+<th class="text-left py-5 px-6 text-xs font-bold uppercase tracking-widest text-slate-500">Split Breakdown</th>
+<th class="text-right py-5 px-6 text-xs font-bold uppercase tracking-widest text-slate-500">Total Amount</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<!-- Row 1 -->
+<tr class="hover:bg-white/5 transition-all duration-300 group/row cursor-pointer hover:shadow-[inset_4px_0_0_0_rgba(0,255,136,0.8)]">
+<td class="py-5 px-6">
+<p class="font-bold text-white group-hover/row:text-primary transition-colors tracking-wide">Project Payment: UI Design</p>
+<p class="text-xs text-slate-500 mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">calendar_today</span> Oct 24, 2023</p>
+</td>
+<td class="py-5 px-6">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-bold border border-blue-500/20 group-hover/row:border-blue-500/40 transition-colors">50% Needs</span>
+<span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20 group-hover/row:border-amber-500/40 transition-colors">30% Wants</span>
+<span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold border border-primary/20 group-hover/row:border-primary/40 transition-colors shadow-[0_0_10px_rgba(0,255,136,0.1)]">20% Savings</span>
+</div>
+</td>
+<td class="py-5 px-6 text-right group-hover/row:scale-105 transition-transform duration-300 origin-right">
+<p class="font-mono font-bold text-white text-lg group-hover/row:text-primary transition-colors">125,000.00</p>
+<p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">KSH</p>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-white/5 transition-all duration-300 group/row cursor-pointer hover:shadow-[inset_4px_0_0_0_rgba(0,255,136,0.8)]">
+<td class="py-5 px-6">
+<p class="font-bold text-white group-hover/row:text-primary transition-colors tracking-wide">Monthly Base Salary</p>
+<p class="text-xs text-slate-500 mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">calendar_today</span> Oct 01, 2023</p>
+</td>
+<td class="py-5 px-6">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-bold border border-blue-500/20 group-hover/row:border-blue-500/40 transition-colors">50% Needs</span>
+<span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20 group-hover/row:border-amber-500/40 transition-colors">30% Wants</span>
+<span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold border border-primary/20 group-hover/row:border-primary/40 transition-colors shadow-[0_0_10px_rgba(0,255,136,0.1)]">20% Savings</span>
+</div>
+</td>
+<td class="py-5 px-6 text-right group-hover/row:scale-105 transition-transform duration-300 origin-right">
+<p class="font-mono font-bold text-white text-lg group-hover/row:text-primary transition-colors">450,000.00</p>
+<p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">KSH</p>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-white/5 transition-all duration-300 group/row cursor-pointer hover:shadow-[inset_4px_0_0_0_rgba(0,255,136,0.8)]">
+<td class="py-5 px-6">
+<p class="font-bold text-white group-hover/row:text-primary transition-colors tracking-wide">Upwork: Logo Refinement</p>
+<p class="text-xs text-slate-500 mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">calendar_today</span> Sep 18, 2023</p>
+</td>
+<td class="py-5 px-6">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded-full bg-white/10 text-slate-300 text-[10px] font-bold border border-white/20 group-hover/row:border-white/40 group-hover/row:text-white transition-colors">Full Savings</span>
+</div>
+</td>
+<td class="py-5 px-6 text-right group-hover/row:scale-105 transition-transform duration-300 origin-right">
+<p class="font-mono font-bold text-white text-lg group-hover/row:text-primary transition-colors">15,400.00</p>
+<p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">KSH</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="py-8 border-t border-white/5 glass mt-12 animate-fade-up delay-400">
+<div class="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+<p class="text-slate-500 text-xs font-medium tracking-wide">© 2024 Budget-Wise Financial OS. All rights reserved.</p>
+<div class="flex items-center gap-6">
+<a class="text-slate-500 hover:text-primary hover:scale-110 transition-all" href="#" title="Help"><span class="material-symbols-outlined text-sm">help_outline</span></a>
+<a class="text-slate-500 hover:text-primary hover:scale-110 transition-all" href="#" title="Settings"><span class="material-symbols-outlined text-sm">settings</span></a>
+<a class="text-slate-500 hover:text-red-400 hover:scale-110 transition-all" href="#" title="Logout"><span class="material-symbols-outlined text-sm">logout</span></a>
+</div>
+</div>
+</footer>
+</div>
+</body></html>
