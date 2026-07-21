@@ -67,3 +67,8 @@ class IncomeService:
         await self.db.commit()
         await self.db.refresh(new_income)
         return new_income
+
+    async def list_income(self, user_id: uuid.UUID) -> list:
+        stmt = select(IncomeEntry).where(IncomeEntry.user_id == user_id).order_by(IncomeEntry.date_received.desc())
+        result = await self.db.execute(stmt)
+        return list(result.scalars().all())

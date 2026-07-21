@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ANTHROPIC_API_KEY: str
-    ANTHROPIC_MODEL: str = "claude-opus-4-6"
+    ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
     ANTHROPIC_MAX_TOKENS: int = 2048
     AI_INSIGHT_CACHE_TTL_SECONDS: int = 3600
     ENVIRONMENT: str = "development"
