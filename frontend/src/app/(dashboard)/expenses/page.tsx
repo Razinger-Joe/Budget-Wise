@@ -237,7 +237,7 @@ export default function ExpensesPage() {
               </div>
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Category</Label>
-                <Select value={category} onValueChange={setCategory}>
+                <Select value={category} onValueChange={(val) => setCategory(val || "")}>
                   <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select category" /></SelectTrigger>
                   <SelectContent>
                     {Object.keys(categoryColors).map((cat) => (
@@ -248,7 +248,7 @@ export default function ExpensesPage() {
               </div>
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Bucket Source</Label>
-                <Select value={bucketSource} onValueChange={setBucketSource}>
+                <Select value={bucketSource} onValueChange={(val) => setBucketSource(val || "")}>
                   <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select bucket" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="basic">Basic Needs</SelectItem>

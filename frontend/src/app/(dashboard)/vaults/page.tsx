@@ -187,7 +187,7 @@ export default function VaultsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
               <div className="space-y-2">
                 <Label>From</Label>
-                <Select value={fromBucket} onValueChange={setFromBucket}>
+                <Select value={fromBucket} onValueChange={(val) => setFromBucket(val || "")}>
                   <SelectTrigger className="rounded-xl"><SelectValue placeholder="Source Vault" /></SelectTrigger>
                   <SelectContent>
                     {VAULT_CONFIGS.map(v => <SelectItem key={v.id} value={v.id}>{v.label}</SelectItem>)}
@@ -196,7 +196,7 @@ export default function VaultsPage() {
               </div>
               <div className="space-y-2">
                 <Label>To</Label>
-                <Select value={toBucket} onValueChange={setToBucket}>
+                <Select value={toBucket} onValueChange={(val) => setToBucket(val || "")}>
                   <SelectTrigger className="rounded-xl"><SelectValue placeholder="Destination Vault" /></SelectTrigger>
                   <SelectContent>
                     {VAULT_CONFIGS.map(v => <SelectItem key={v.id} value={v.id}>{v.label}</SelectItem>)}

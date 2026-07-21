@@ -127,7 +127,7 @@ export default function DashboardLayout({
           <div className="flex items-center gap-4">
             {/* Mobile menu */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger asChild>
+              <SheetTrigger>
                 <Button
                   variant="ghost"
                   size="icon"

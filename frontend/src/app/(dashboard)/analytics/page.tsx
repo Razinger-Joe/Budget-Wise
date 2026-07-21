@@ -153,7 +153,7 @@ export default function AnalyticsPage() {
                   <Tooltip 
                     cursor={{ fill: "hsl(var(--muted))", opacity: 0.2 }}
                     contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)" }}
-                    formatter={(val: number) => [`KSH ${val.toLocaleString()}`]}
+                    formatter={(value) => [`KSH ${Number(value || 0).toLocaleString()}`]}
                   />
                   <Legend wrapperStyle={{ paddingTop: "20px" }} />
                   <Bar dataKey="income" name="Income" fill="var(--primary)" radius={[4, 4, 0, 0]} />
@@ -188,7 +188,7 @@ export default function AnalyticsPage() {
                       ))}
                     </Pie>
                     <Tooltip 
-                      formatter={(val: number) => `KSH ${val.toLocaleString()}`}
+                      formatter={(value) => `KSH ${Number(value || 0).toLocaleString()}`}
                       contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))" }}
                     />
                   </PieChart>
