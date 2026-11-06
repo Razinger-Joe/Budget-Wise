@@ -1,308 +1,506 @@
 <!DOCTYPE html>
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Log Expense | Budget-Wise</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#00ff88",
-                        "coral": "#ff7f50",
-                        "background-light": "#f5f8f7",
-                        "background-dark": "#0a0f0d",
-                        "obsidian": "#050807",
-                    },
-                    fontFamily: {
-                        "display": ["Manrope", "sans-serif"]
-                    },
-                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
-                    animation: {
-                        'fade-up': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'fill-gauge': 'fillGauge 1.5s ease-out forwards',
-                    },
-                    keyframes: {
-                        fadeUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        fillGauge: {
-                            '0%': { transform: 'rotate(45deg)' },
-                            '100%': { transform: 'rotate(135deg)' },
-                        }
-                    }
-                },
-            },
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Form MOH-705: Outflow &amp; Disbursement Protocol | Budget-Wise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"IBM Plex Sans"', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'monospace'],
+          },
+          colors: {
+            kenya: {
+              DEFAULT: '#006A4E',
+              dark: '#004F3A',
+              deep: '#003328',
+              light: '#E6F5F1',
+              accent: '#E8A020',
+              red: '#BA1B1B'
+            }
+          }
         }
-    </script>
-<style>
-        .glass {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .glass:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-        .coral-glow {
-            box-shadow: 0 -10px 40px -10px rgba(255, 127, 80, 0.15);
-        }
-        .gauge-container {
-            position: relative;
-            width: 200px;
-            height: 100px;
-            overflow: hidden;
-        }
-        .gauge-body {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 20px solid rgba(0, 255, 136, 0.1);
-            border-bottom-color: transparent;
-            border-right-color: transparent;
-            transform: rotate(45deg);
-        }
-        .gauge-fill {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 20px solid #00ff88;
-            border-bottom-color: transparent;
-            border-right-color: transparent;
-            transform: rotate(45deg); /* Start empty, config animation will rotate it to 135deg */
-        }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 127, 80, 0.4); /* Coral color */
-        }
-        
-        /* Utility classes for animation delays */
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        
-        /* Hide element initially for fade-up animation */
-        .animate-fade-up {
-            opacity: 0;
-        }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background-color: #f4f4f4;
+      color: #161616;
+      margin: 0;
+      padding: 0;
+    }
+    .font-mono { font-family: 'IBM Plex Mono', monospace; }
+    
+    .emr-flag-strip {
+      height: 3px;
+      background: linear-gradient(
+        to right,
+        #000000 0%, #000000 25%,
+        #BA1B1B 25%, #BA1B1B 50%,
+        #006A4E 50%, #006A4E 75%,
+        #E8A020 75%, #E8A020 100%
+      );
+    }
+    
+    .emr-utility-strip {
+      background: #1f2937;
+      color: #d1d5db;
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    
+    .emr-dossier-banner {
+      background: #ffffff;
+      border: 1px solid #c6c6c6;
+      border-left: 5px solid #006A4E;
+    }
+    
+    .emr-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .emr-table th {
+      background: #004F3A;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 8px 12px;
+      text-align: left;
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+    .emr-table td {
+      padding: 7px 12px;
+      border-bottom: 1px solid #e0e0e0;
+      border-right: 1px solid #e0e0e0;
+    }
+    .emr-table tr:nth-child(even) td {
+      background: #fafafa;
+    }
+    .emr-table tr:hover td {
+      background: #f0f7f4;
+    }
+
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(2px);
+    }
+  </style>
 </head>
-<body class="bg-obsidian text-slate-100 font-display min-h-screen custom-scrollbar selection:bg-coral selection:text-obsidian">
-<div class="max-w-5xl mx-auto px-6 py-8">
-<!-- Top Navigation (Updated to match Income page style) -->
-<header class="flex items-center justify-between mb-12 glass px-6 py-4 rounded-3xl sticky top-4 z-50 animate-fade-up">
-<div class="flex items-center gap-3 group cursor-pointer" onclick="window.location.href='index.html'">
-<div class="size-9 bg-primary/20 rounded-lg flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-background-dark transition-all duration-300 shadow-[0_0_15px_rgba(0,255,136,0.2)] group-hover:shadow-[0_0_20px_rgba(0,255,136,0.4)]">
-<span class="material-symbols-outlined font-bold group-hover:scale-110 transition-transform">account_balance_wallet</span>
-</div>
-<h2 class="text-xl font-extrabold tracking-tight text-white group-hover:text-primary transition-colors">Budget<span class="text-primary group-hover:text-white transition-colors">-Wise</span></h2>
-</div>
-<div class="flex items-center gap-4">
-<nav class="hidden md:flex items-center gap-1 mr-6">
-<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="index.html">Dashboard</a>
-<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="income.html">Income</a>
-<a class="px-4 py-2 text-sm font-medium text-coral bg-coral/10 rounded-lg shadow-[0_0_10px_rgba(255,127,80,0.1)]" href="expense.html">Expenses</a>
-<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all group flex items-center gap-1" href="vaults.html"><span class="material-symbols-outlined text-[16px] group-hover:text-primary transition-colors">encrypted</span> Vaults</a>
-</nav>
-<button class="size-10 flex items-center justify-center rounded-xl glass hover:bg-white/10 hover:text-coral transition-all group">
-<span class="material-symbols-outlined text-slate-300 group-hover:text-coral transition-colors">notifications</span>
-</button>
-<div class="size-10 rounded-full border-2 border-coral/30 p-0.5 hover:border-coral transition-colors cursor-pointer shadow-[0_0_10px_rgba(255,127,80,0.1)] hover:shadow-[0_0_15px_rgba(255,127,80,0.3)] group">
-<div class="w-full h-full rounded-full bg-obsidian flex items-center justify-center text-coral group-hover:bg-coral group-hover:text-obsidian transition-colors">
-<span class="material-symbols-outlined font-bold text-sm">person</span>
-</div>
-</div>
-</div>
-</header>
-<!-- Hero: Budget Health Gauge -->
-<section class="flex flex-col items-center justify-center mb-16 py-10 bg-gradient-to-b from-primary/5 to-transparent rounded-3xl border border-white/5 animate-fade-up delay-100">
-<div class="gauge-container mb-4">
-<div class="gauge-body"></div>
-<div class="gauge-fill animate-fill-gauge delay-300"></div>
-<div class="absolute inset-0 flex flex-col items-center justify-end pb-2">
-<span class="text-3xl font-bold text-white leading-none">50%</span>
-<span class="text-[10px] uppercase tracking-widest text-primary font-bold drop-shadow-[0_0_8px_rgba(0,255,136,0.3)]">Health</span>
-</div>
-</div>
-<div class="text-center">
-<h2 class="text-xl font-semibold text-white tracking-tight">Budget Stability: Excellent</h2>
-<p class="text-slate-400 text-sm mt-1">KSH 25,000 of KSH 50,000 monthly limit used</p>
-</div>
-</section>
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 relative">
-<!-- Left Column: Log Expense Form -->
-<div class="lg:col-span-5 animate-fade-up delay-200">
-<div class="glass coral-glow rounded-3xl p-8 sticky top-32 group/card hover:border-coral/30 transition-colors duration-500 hover:shadow-[0_0_40px_rgba(255,127,80,0.15)] relative overflow-hidden">
-<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-coral to-transparent opacity-50 group-hover/card:opacity-100 transition-opacity duration-500 shadow-[0_5px_15px_rgba(255,127,80,0.5)]"></div>
-<div class="flex items-center gap-2 mb-8 relative z-10">
-<span class="material-symbols-outlined text-coral drop-shadow-[0_0_8px_rgba(255,127,80,0.5)]">add_circle</span>
-<h3 class="text-xl font-bold text-white tracking-tight">Log New Expense</h3>
-</div>
-<form class="space-y-6 relative z-10">
-<div class="space-y-2 group/input">
-<label class="text-sm font-medium text-slate-400 ml-1 group-focus-within/input:text-coral transition-colors tracking-wide">Description</label>
-<input class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:bg-white/10 focus:border-transparent focus:ring-2 focus:ring-coral/50 outline-none text-white transition-all duration-300 focus:shadow-[0_0_15px_rgba(255,127,80,0.15)]" placeholder="e.g. Weekly Grocery Run" type="text"/>
-</div>
-<div class="space-y-2 group/amount">
-<label class="text-sm font-medium text-slate-400 ml-1 group-focus-within/amount:text-coral transition-colors tracking-wide">Amount (KSH)</label>
-<input class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:bg-white/10 focus:border-transparent focus:ring-2 focus:ring-coral/50 outline-none text-white transition-all duration-300 focus:shadow-[0_0_15px_rgba(255,127,80,0.15)] font-mono text-lg" placeholder="0.00" type="number"/>
-</div>
-<div class="space-y-3">
-<label class="text-sm font-medium text-slate-400 ml-1 tracking-wide">Category</label>
-<div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar custom-scrollbar">
-<button class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full bg-coral/20 text-coral border border-coral/30 text-sm font-medium shadow-[0_0_15px_rgba(255,127,80,0.15)] transition-all hover:bg-coral/30" type="button">
-<span class="material-symbols-outlined text-lg">home</span> Home
-                                </button>
-<button class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/5 text-slate-300 border border-white/10 text-sm font-medium hover:bg-white/10 hover:text-white transition-all group" type="button">
-<span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">shopping_cart</span> Shopping
-                                </button>
-<button class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/5 text-slate-300 border border-white/10 text-sm font-medium hover:bg-white/10 hover:text-white transition-all group" type="button">
-<span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">restaurant</span> Food
-                                </button>
-<button class="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/5 text-slate-300 border border-white/10 text-sm font-medium hover:bg-white/10 hover:text-white transition-all group" type="button">
-<span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">directions_car</span> Transport
-                                </button>
-</div>
-</div>
-<div class="space-y-2 group/date">
-<label class="text-sm font-medium text-slate-400 ml-1 group-focus-within/date:text-coral transition-colors tracking-wide">Date</label>
-<div class="relative">
-<input class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:bg-white/10 focus:border-transparent focus:ring-2 focus:ring-coral/50 outline-none text-white transition-all duration-300 focus:shadow-[0_0_15px_rgba(255,127,80,0.15)] [color-scheme:dark]" type="date" value="2023-10-24"/>
-</div>
-</div>
-<button class="w-full bg-gradient-to-r from-orange-500 to-coral text-obsidian font-extrabold text-lg py-4 rounded-xl shadow-[0_10px_30px_-10px_rgba(255,127,80,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(255,127,80,0.6)] hover:-translate-y-1 transition-all duration-300 active:scale-[0.98] mt-4 flex justify-center items-center gap-2">
-<span class="material-symbols-outlined font-bold">payments</span> Save Expense
-                        </button>
-</form>
-</div>
-</div>
-<!-- Right Column: Recent Expenses -->
-<div class="lg:col-span-7 space-y-6 animate-fade-up delay-300">
-<div class="flex items-center justify-between mb-4 px-2">
-<h3 class="text-xl font-bold text-white tracking-tight">Recent Transactions</h3>
-<button class="text-primary text-sm font-semibold hover:underline flex items-center gap-1 group">View All <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span></button>
-</div>
-<!-- Transaction Rows -->
-<div class="space-y-3">
-<div class="glass flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer group/row hover:shadow-[inset_4px_0_0_0_rgba(255,127,80,0.8)] border border-transparent hover:border-white/5">
-<div class="flex items-center gap-4 group-hover/row:translate-x-2 transition-transform duration-300">
-<div class="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover/row:bg-primary/20 transition-colors shadow-[0_0_10px_rgba(0,255,136,0.1)]">
-<span class="material-symbols-outlined">shopping_bag</span>
-</div>
-<div>
-<p class="text-white font-semibold tracking-wide">Zucchini Groceries</p>
-<p class="text-slate-500 text-xs uppercase tracking-wider font-bold">Shopping • Today</p>
-</div>
-</div>
-<div class="text-right flex items-center gap-3">
-<p class="text-coral font-bold font-mono text-lg">KSH 4,200</p>
-<span class="material-symbols-outlined text-slate-600 group-hover/row:text-coral transition-colors">chevron_right</span>
-</div>
-</div>
-<div class="glass flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer group/row hover:shadow-[inset_4px_0_0_0_rgba(255,127,80,0.8)] border border-transparent hover:border-white/5">
-<div class="flex items-center gap-4 group-hover/row:translate-x-2 transition-transform duration-300">
-<div class="size-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover/row:bg-blue-500/20 transition-colors shadow-[0_0_10px_rgba(59,130,246,0.1)]">
-<span class="material-symbols-outlined">lightbulb</span>
-</div>
-<div>
-<p class="text-white font-semibold tracking-wide">KPLC Token</p>
-<p class="text-slate-500 text-xs uppercase tracking-wider font-bold">Home • Yesterday</p>
-</div>
-</div>
-<div class="text-right flex items-center gap-3">
-<p class="text-coral font-bold font-mono text-lg">KSH 2,500</p>
-<span class="material-symbols-outlined text-slate-600 group-hover/row:text-coral transition-colors">chevron_right</span>
-</div>
-</div>
-<div class="glass flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer group/row hover:shadow-[inset_4px_0_0_0_rgba(255,127,80,0.8)] border border-transparent hover:border-white/5">
-<div class="flex items-center gap-4 group-hover/row:translate-x-2 transition-transform duration-300">
-<div class="size-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover/row:bg-orange-500/20 transition-colors shadow-[0_0_10px_rgba(249,115,22,0.1)]">
-<span class="material-symbols-outlined">directions_car</span>
-</div>
-<div>
-<p class="text-white font-semibold tracking-wide">Uber Trip</p>
-<p class="text-slate-500 text-xs uppercase tracking-wider font-bold">Transport • 22 Oct</p>
-</div>
-</div>
-<div class="text-right flex items-center gap-3">
-<p class="text-coral font-bold font-mono text-lg">KSH 850</p>
-<span class="material-symbols-outlined text-slate-600 group-hover/row:text-coral transition-colors">chevron_right</span>
-</div>
-</div>
-<div class="glass flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer group/row hover:shadow-[inset_4px_0_0_0_rgba(255,127,80,0.8)] border border-transparent hover:border-white/5">
-<div class="flex items-center gap-4 group-hover/row:translate-x-2 transition-transform duration-300">
-<div class="size-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover/row:bg-purple-500/20 transition-colors shadow-[0_0_10px_rgba(168,85,247,0.1)]">
-<span class="material-symbols-outlined">movie</span>
-</div>
-<div>
-<p class="text-white font-semibold tracking-wide">Netflix Subscription</p>
-<p class="text-slate-500 text-xs uppercase tracking-wider font-bold">Entertainment • 20 Oct</p>
-</div>
-</div>
-<div class="text-right flex items-center gap-3">
-<p class="text-coral font-bold font-mono text-lg">KSH 1,100</p>
-<span class="material-symbols-outlined text-slate-600 group-hover/row:text-coral transition-colors">chevron_right</span>
-</div>
-</div>
-<div class="glass flex items-center justify-between p-4 rounded-2xl hover:bg-white/5 transition-all duration-300 cursor-pointer group/row hover:shadow-[inset_4px_0_0_0_rgba(255,127,80,0.8)] border border-transparent hover:border-white/5">
-<div class="flex items-center gap-4 group-hover/row:translate-x-2 transition-transform duration-300">
-<div class="size-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-400 group-hover/row:bg-green-500/20 transition-colors shadow-[0_0_10px_rgba(34,197,94,0.1)]">
-<span class="material-symbols-outlined">restaurant</span>
-</div>
-<div>
-<p class="text-white font-semibold tracking-wide">Java House Lunch</p>
-<p class="text-slate-500 text-xs uppercase tracking-wider font-bold">Food • 18 Oct</p>
-</div>
-</div>
-<div class="text-right flex items-center gap-3">
-<p class="text-coral font-bold font-mono text-lg">KSH 1,850</p>
-<span class="material-symbols-outlined text-slate-600 group-hover/row:text-coral transition-colors">chevron_right</span>
-</div>
-</div>
-</div>
-<!-- Monthly Summary Card -->
-<div class="glass rounded-3xl p-6 bg-gradient-to-br from-white/5 to-primary/5 hover:border-primary/30 transition-colors duration-500 relative overflow-hidden group/summary cursor-pointer">
-<div class="absolute -right-8 -top-8 w-32 h-32 bg-primary/10 rounded-full group-hover/summary:bg-primary/20 transition-all blur-2xl duration-700 group-hover/summary:scale-150"></div>
-<div class="flex justify-between items-center relative z-10">
-<div>
-<p class="text-slate-400 text-sm font-medium tracking-wide">Projected End Balance</p>
-<p class="text-3xl font-extrabold text-white font-mono mt-1">KSH 12,450</p>
-</div>
-<div class="text-right">
-<p class="text-primary text-sm font-bold bg-primary/10 px-2 py-1 rounded inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">trending_up</span> +12% from last month</p>
-<div class="h-1.5 w-32 bg-white/10 rounded-full mt-3 overflow-hidden ml-auto">
-<div class="h-full bg-primary rounded-full drop-shadow-[0_0_8px_rgba(0,255,136,0.5)] transition-all duration-1000 ease-out" style="width: 0%; animation: fillBar 1.5s ease-out 0.5s forwards;"></div>
-<style>@keyframes fillBar { to { width: 65%; } }</style>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</body></html>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <div class="emr-flag-strip"></div>
+
+  <div class="emr-utility-strip px-4 py-1.5 flex flex-wrap items-center justify-between border-b border-gray-700">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 font-bold text-emerald-400">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        MFL #14022
+      </span>
+      <span class="text-gray-400">|</span>
+      <span>Form MOH-705 Outflow Protocol</span>
+      <span class="text-gray-400">|</span>
+      <span class="text-red-300">Expenditure Authorization Active</span>
+    </div>
+    <div class="flex items-center gap-4 text-[10px]">
+      <span class="text-gray-300">FY 2026/2027 Q3</span>
+      <span class="text-gray-400">|</span>
+      <span class="bg-emerald-900/80 text-emerald-200 px-2 py-0.5 rounded border border-emerald-700 font-semibold">STANDARDIZED EMIS</span>
+      <span class="text-gray-400">|</span>
+      <span id="liveTimestamp" class="text-gray-300">--:--:-- EAT</span>
+    </div>
+  </div>
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Institutional Sidebar -->
+    <aside class="w-64 bg-[#004F3A] text-white flex flex-col justify-between shrink-0 shadow-lg border-r border-[#003328]">
+      <div>
+        <div class="p-4 border-b border-emerald-800/60 bg-[#003328]">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded bg-emerald-600 flex items-center justify-center font-bold text-white shadow-inner">
+              <span class="material-symbols-outlined text-xl">account_balance</span>
+            </div>
+            <div>
+              <h1 class="font-bold text-sm tracking-tight leading-tight">BUDGET-WISE EMR</h1>
+              <p class="text-[10px] text-emerald-300 font-mono uppercase tracking-wider">MOH Treasury Protocol</p>
+            </div>
+          </div>
+        </div>
+
+        <nav class="p-3 space-y-1 text-xs font-medium">
+          <div class="px-3 py-1.5 text-[10px] uppercase tracking-wider text-emerald-300/70 font-mono font-bold">
+            Surveillance &amp; Registers
+          </div>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 rounded text-emerald-100 hover:bg-emerald-800/60 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-base">dashboard</span>
+            <span>Client Dashboard</span>
+          </a>
+          <a href="income.html" class="flex items-center gap-2.5 px-3 py-2 rounded text-emerald-100 hover:bg-emerald-800/60 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-base">payments</span>
+            <span>MOH-711 Inflow Form</span>
+          </a>
+          <a href="expense.html" class="flex items-center gap-2.5 px-3 py-2 rounded bg-emerald-800 text-white font-semibold shadow-sm border border-emerald-600">
+            <span class="material-symbols-outlined text-base">receipt_long</span>
+            <span>MOH-705 Outflows</span>
+          </a>
+          <a href="vaults.html" class="flex items-center gap-2.5 px-3 py-2 rounded text-emerald-100 hover:bg-emerald-800/60 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-base">shield_with_heart</span>
+            <span>MOH-720 Vault Reserves</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="p-3 border-t border-emerald-800/60 bg-[#003328]/80 text-[11px]">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-emerald-700 flex items-center justify-center font-bold text-xs text-white">
+            AM
+          </div>
+          <div class="leading-tight">
+            <div class="font-semibold text-white truncate">Alex Mbuthia</div>
+            <div class="text-[10px] text-emerald-300 font-mono">ID: 32890412 · Nairobi</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Work Area -->
+    <main class="flex-1 overflow-y-auto bg-[#f4f4f4] p-5 space-y-4">
+      
+      <!-- Master Client Dossier Banner -->
+      <section class="emr-dossier-banner p-3.5 shadow-sm rounded-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="flex items-start md:items-center gap-3">
+            <div class="w-12 h-12 bg-[#004F3A] text-white rounded flex items-center justify-center font-bold text-lg shrink-0 border border-emerald-700">
+              AM
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-base font-bold tracking-tight text-gray-900 uppercase">ALEX MBUTHIA</h2>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#E6F5F1] text-[#004F3A] border border-[#c2e2d6]">
+                  UPI: KE-BW-2026-89412
+                </span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-100 text-red-800 border border-red-300">
+                  FORM MOH-705 OUTFLOWS
+                </span>
+              </div>
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600 font-mono mt-1">
+                <span><strong>National ID:</strong> 32890412</span>
+                <span><strong>Available Needs Balance:</strong> KES 124,500.00</span>
+                <span><strong>Emergency Locked:</strong> KES 1,250,000.00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <a href="index.html" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium border border-gray-400 bg-white hover:bg-gray-50 text-gray-800 rounded shadow-sm">
+              <span class="material-symbols-outlined text-sm">arrow_back</span>
+              <span>Back to Dashboard</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Form MOH-705 Outflows Capture -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Input Form -->
+        <div class="lg:col-span-7 bg-white border border-gray-300 rounded-sm p-4 shadow-sm">
+          <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-4">
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-red-700 text-base">receipt</span>
+                MOH-705 Disbursement Voucher Entry
+              </h3>
+              <p class="text-[11px] text-gray-500">Authorized debit against treasury compartments with strict vault protection.</p>
+            </div>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800 border border-amber-300">
+              STRICT AUDIT
+            </span>
+          </div>
+
+          <!-- Dynamic Emergency Warning Alert -->
+          <div id="emergencyWarningBox" class="hidden p-3 mb-3 bg-red-50 border-l-4 border-red-600 text-xs text-red-900 rounded">
+            <div class="flex items-start gap-2">
+              <span class="material-symbols-outlined text-red-600 text-base shrink-0">warning</span>
+              <div>
+                <strong class="font-bold">CRITICAL REGULATORY ALERT:</strong>
+                <p class="mt-0.5">Withdrawing from the Emergency Reserve breaches Protocol MOH-705 covenants and depletes the 6-month safety runway. Requires Treasury Supervisor justification.</p>
+              </div>
+            </div>
+          </div>
+
+          <form id="expenseForm" onsubmit="handleExpenseSubmit(event)" class="space-y-3.5 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Payee / Vendor / Purpose *</label>
+                <input 
+                  type="text" 
+                  id="payeeInput" 
+                  required 
+                  placeholder="e.g. Kenya Power &amp; Lighting Co." 
+                  class="w-full px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#006A4E]"
+                />
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Expenditure Category *</label>
+                <select id="expenseCategoryInput" class="w-full px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#006A4E]">
+                  <option value="Essential Needs & Utility">Essential Needs &amp; Utility</option>
+                  <option value="Monthly Food Rations">Monthly Food Rations</option>
+                  <option value="Discretionary & Leisure">Discretionary &amp; Leisure</option>
+                  <option value="Healthcare & Clinical Emergency">Healthcare &amp; Clinical Emergency</option>
+                  <option value="Capital Investment Reinvestment">Capital Investment Reinvestment</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Debit Vault Compartment *</label>
+                <select id="debitVaultInput" onchange="checkVaultSelection(this.value)" class="w-full px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#006A4E] font-medium">
+                  <option value="Operational Liquidity (Needs - 50%)">Operational Liquidity (Needs - 50%)</option>
+                  <option value="Discretionary Buffer (Wants - 20%)">Discretionary Buffer (Wants - 20%)</option>
+                  <option value="Capital Growth (Investment - 15%)">Capital Growth (Investment - 15%)</option>
+                  <option value="Sovereign Emergency Reserve (15% - PROTECTED)">⚠ Sovereign Emergency Reserve (15% - PROTECTED)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Payment Channel *</label>
+                <select id="expenseChannelInput" class="w-full px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#006A4E]">
+                  <option value="M-PESA Paybill / Till">M-PESA Paybill / Till</option>
+                  <option value="Bank EFT (KCB/Equity)">Bank EFT (KCB/Equity)</option>
+                  <option value="Official Cash Voucher">Official Cash Voucher</option>
+                  <option value="Treasury Card Disbursal">Treasury Card Disbursal</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Transaction Ref Code *</label>
+                <input 
+                  type="text" 
+                  id="expenseRefInput" 
+                  required 
+                  placeholder="e.g. QK8912KL33" 
+                  class="w-full px-3 py-1.5 border border-gray-300 rounded font-mono uppercase focus:outline-none focus:border-[#006A4E]"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Disbursement Amount (KES) *</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-2 text-xs font-mono font-bold text-gray-500">KES</span>
+                  <input 
+                    type="number" 
+                    id="expenseAmountInput" 
+                    required 
+                    min="1" 
+                    step="1"
+                    placeholder="4500" 
+                    class="w-full pl-12 pr-3 py-1.5 border-2 border-red-500 rounded font-mono font-bold focus:outline-none focus:border-red-700"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" class="w-full py-2 bg-gray-900 hover:bg-black text-white font-bold rounded shadow transition-colors flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">receipt_long</span>
+                <span>Issue &amp; Clear Disbursement Voucher</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Real-Time Safeguard & Reserve Depletion Status -->
+        <div class="lg:col-span-5 bg-white border border-gray-300 rounded-sm p-4 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-red-700 text-base">shield</span>
+                Disbursement Safety Protocol
+              </h3>
+              <span class="text-[10px] font-mono text-gray-500">MOH-705 Rules</span>
+            </div>
+
+            <div class="space-y-3 font-mono text-xs">
+              <div class="p-2.5 rounded bg-gray-50 border border-gray-200">
+                <div class="text-[10px] uppercase font-bold text-gray-500 font-sans">Current Needs Vault Ceiling</div>
+                <div class="text-lg font-bold text-gray-900 mt-0.5">KES 124,500.00</div>
+                <div class="text-[10px] text-emerald-700 font-sans mt-1">✔ Ample operational liquidity</div>
+              </div>
+
+              <div class="p-2.5 rounded bg-emerald-50 border border-emerald-200">
+                <div class="text-[10px] uppercase font-bold text-emerald-800 font-sans">Emergency Safety Lock</div>
+                <div class="text-lg font-bold text-emerald-800 mt-0.5">KES 1,250,000.00</div>
+                <div class="text-[10px] text-emerald-700 font-sans mt-1">🔒 8.2 Months of living expenses protected</div>
+              </div>
+
+              <div class="p-2.5 rounded bg-amber-50 border border-amber-200">
+                <div class="text-[10px] uppercase font-bold text-amber-800 font-sans">Quarterly Outflow Ratio</div>
+                <div class="text-lg font-bold text-amber-800 mt-0.5">32.4% / 50.0% Max</div>
+                <div class="text-[10px] text-amber-700 font-sans mt-1">✔ 17.6% safety margin remaining</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-gray-200 text-xs text-gray-500 font-mono">
+            Audit Check: Automated daily reconciliation with Central Bank standards.
+          </div>
+        </div>
+      </section>
+
+      <!-- Outflows Encounter Table -->
+      <section class="bg-white border border-gray-300 rounded-sm p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="text-sm font-bold uppercase tracking-tight text-gray-900 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[#006A4E] text-base">format_list_bulleted</span>
+              Form MOH-705 Outflow Encounter Ledger
+            </h3>
+            <p class="text-xs text-gray-500">Official registry of disbursed treasury vouchers.</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-gray-300 rounded-sm">
+          <table class="emr-table" id="expenseTable">
+            <thead>
+              <tr>
+                <th style="width: 105px;">Date</th>
+                <th style="width: 130px;">Voucher Ref</th>
+                <th>Payee / Vendor</th>
+                <th style="width: 160px;">Debit Vault</th>
+                <th style="width: 120px;">Ref Code</th>
+                <th style="width: 120px; text-align: right;">Amount (KES)</th>
+                <th style="width: 90px; text-align: center;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-mono text-gray-600">2026-11-05</td>
+                <td class="font-mono font-bold text-[#004F3A]">VCH-2026-0041</td>
+                <td>
+                  <div class="font-semibold text-gray-900">Nairobi Water &amp; Sewerage Co.</div>
+                  <div class="text-[10px] text-gray-500 font-mono">Essential Needs &amp; Utility</div>
+                </td>
+                <td class="font-mono text-gray-700">Operational Liquidity (50%)</td>
+                <td class="font-mono text-gray-700">QK8912KL</td>
+                <td class="font-mono font-bold text-right text-red-700">- 4,200.00</td>
+                <td class="text-center">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    CLEARED
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-mono text-gray-600">2026-11-02</td>
+                <td class="font-mono font-bold text-[#004F3A]">VCH-2026-0040</td>
+                <td>
+                  <div class="font-semibold text-gray-900">Carrefour Sarit Centre</div>
+                  <div class="text-[10px] text-gray-500 font-mono">Monthly Food Rations</div>
+                </td>
+                <td class="font-mono text-gray-700">Operational Liquidity (50%)</td>
+                <td class="font-mono text-gray-700">QJ7109PA</td>
+                <td class="font-mono font-bold text-right text-red-700">- 18,450.00</td>
+                <td class="text-center">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    CLEARED
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-mono text-gray-600">2026-10-28</td>
+                <td class="font-mono font-bold text-[#004F3A]">VCH-2026-0039</td>
+                <td>
+                  <div class="font-semibold text-gray-900">TotalEnergies Westlands</div>
+                  <div class="text-[10px] text-gray-500 font-mono">Commute &amp; Fuel</div>
+                </td>
+                <td class="font-mono text-gray-700">Operational Liquidity (50%)</td>
+                <td class="font-mono text-gray-700">QH5541ZZ</td>
+                <td class="font-mono font-bold text-right text-red-700">- 7,500.00</td>
+                <td class="text-center">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    CLEARED
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const eat = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Africa/Nairobi',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      }).format(now);
+      const el = document.getElementById('liveTimestamp');
+      if (el) el.textContent = eat + ' EAT';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function checkVaultSelection(val) {
+      const box = document.getElementById('emergencyWarningBox');
+      if (val.includes('Emergency')) {
+        box.classList.remove('hidden');
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
+    function handleExpenseSubmit(e) {
+      e.preventDefault();
+      const payee = document.getElementById('payeeInput').value;
+      const cat = document.getElementById('expenseCategoryInput').value;
+      const vault = document.getElementById('debitVaultInput').value;
+      const channel = document.getElementById('expenseChannelInput').value;
+      const ref = document.getElementById('expenseRefInput').value;
+      const amount = parseFloat(document.getElementById('expenseAmountInput').value) || 0;
+
+      const dateStr = new Date().toISOString().split('T')[0];
+      const voucherNum = 'VCH-2026-0' + Math.floor(42 + Math.random() * 50);
+
+      const tableBody = document.querySelector('#expenseTable tbody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="font-mono text-gray-600">${dateStr}</td>
+        <td class="font-mono font-bold text-[#004F3A]">${voucherNum}</td>
+        <td>
+          <div class="font-semibold text-gray-900">${payee}</div>
+          <div class="text-[10px] text-gray-500 font-mono">${cat}</div>
+        </td>
+        <td class="font-mono text-gray-700">${vault.split('(')[0]}</td>
+        <td class="font-mono text-gray-700">${ref}</td>
+        <td class="font-mono font-bold text-right text-red-700">- ${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+        <td class="text-center">
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+            CLEARED
+          </span>
+        </td>
+      `;
+      tableBody.insertBefore(tr, tableBody.firstChild);
+
+      alert(`Disbursement voucher of KES ${amount.toLocaleString()} issued under Form MOH-705!\nVoucher Reference: ${voucherNum}`);
+      document.getElementById('expenseForm').reset();
+      checkVaultSelection('');
+    }
+  </script>
+</body>
+</html>
