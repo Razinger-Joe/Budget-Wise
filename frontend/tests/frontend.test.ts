@@ -161,3 +161,145 @@ describe("Proxy Route Protection Logic", () => {
     assert.equal(shouldBypassAuth("/help"), false);
   });
 });
+
+/* ── 6. TaifaCare Indicator Surveillance Benchmarks ───────── */
+describe("TaifaCare Indicator Surveillance Benchmarks", () => {
+  function evaluateIndicator(code: string, value: number, baseline: number) {
+    switch (code) {
+      case "BW-IND-01": // Living Needs Ratio
+        return value <= baseline ? "NORMAL" : "ELEVATED";
+      case "BW-IND-02": // Disbursement Velocity
+        return value <= baseline ? "CONTROLLED" : "DEFICIT";
+      case "BW-IND-03": // Surplus Buffer
+        return value >= baseline ? "ACCUMULATING" : "DRAWDOWN";
+      case "BW-IND-04": // Emergency Reserve Runway
+        return value >= baseline ? "PROTECTED" : "VULNERABLE";
+      default:
+        return "UNKNOWN";
+    }
+  }
+
+  it("should assess controlled disbursement when spending is below income", () => {
+    assert.equal(evaluateIndicator("BW-IND-02", 70000, 100000), "CONTROLLED");
+    assert.equal(evaluateIndicator("BW-IND-02", 120000, 100000), "DEFICIT");
+  });
+
+  it("should assess protected status when emergency runway >= 3 months", () => {
+    assert.equal(evaluateIndicator("BW-IND-04", 4.5, 3.0), "PROTECTED");
+    assert.equal(evaluateIndicator("BW-IND-04", 1.2, 3.0), "VULNERABLE");
+  });
+
+  it("should assess accumulating surplus buffer", () => {
+    assert.equal(evaluateIndicator("BW-IND-03", 45000, 30000), "ACCUMULATING");
+    assert.equal(evaluateIndicator("BW-IND-03", -15000, 0), "DRAWDOWN");
+  });
+});
+
+/* ── 7. Voucher & M-Pesa Identifier Protocol ──────────────── */
+describe("Encounter Reference & Voucher Code Formats", () => {
+  function formatVoucher(index: number, prefix: "VCH" | "REC" = "VCH"): string {
+    return `${prefix}-${String(index).padStart(4, "0")}`;
+  }
+
+  function sanitizeMpesaRef(input: string): string {
+    return input.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  }
+
+  it("should format voucher references with 4-digit zero-padded index", () => {
+    assert.equal(formatVoucher(1, "VCH"), "VCH-0001");
+    assert.equal(formatVoucher(42, "REC"), "REC-0042");
+    assert.equal(formatVoucher(105, "VCH"), "VCH-0105");
+  });
+
+  it("should sanitize and normalize Kenyan M-Pesa confirmation codes", () => {
+    assert.equal(sanitizeMpesaRef(" tk78qw194j "), "TK78QW194J");
+    assert.equal(sanitizeMpesaRef("qf-49-aa-812"), "QF49AA812");
+  });
+});
+
+/* ── 8. Categorical Expenditure Epidemiology & Aggregation ── */
+describe("Categorical Expenditure Aggregation", () => {
+  const sampleExpenses = [
+    { category: "food", amount: 25000 },
+    { category: "rent", amount: 50000 },
+    { category: "transport", amount: 15000 },
+    { category: "food", amount: 10000 },
+  ];
+
+  function aggregateCategories(expenses: typeof sampleExpenses) {
+    const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+    const totals: Record<string, number> = {};
+    for (const e of expenses) {
+      totals[e.category] = (totals[e.category] || 0) + e.amount;
+    }
+    const breakdown = Object.entries(totals).map(([name, amount]) => ({
+      name,
+      amount,
+      pct: Math.round((amount / total) * 100),
+    }));
+    return { total, breakdown };
+  }
+
+  it("should aggregate multi-entry categories accurately", () => {
+    const { total, breakdown } = aggregateCategories(sampleExpenses);
+    assert.equal(total, 100000);
+    const food = breakdown.find((b) => b.name === "food");
+    assert.ok(food);
+    assert.equal(food.amount, 35000);
+    assert.equal(food.pct, 35);
+  });
+
+  it("should compute accurate percentage shares for Recharts donut view", () => {
+    const { breakdown } = aggregateCategories(sampleExpenses);
+    const rent = breakdown.find((b) => b.name === "rent");
+    assert.ok(rent);
+    assert.equal(rent.pct, 50);
+  });
+});
+
+/* ── 9. Inter-Vault Custody Transfer Validation ───────────── */
+describe("Inter-Vault Custody Transfer Validation", () => {
+  function validateTransfer(from: string, to: string, amount: number, currentBal: number) {
+    if (!from || !to) return { valid: false, error: "Source and destination required" };
+    if (from === to) return { valid: false, error: "Source and destination cannot be identical" };
+    if (amount <= 0 || isNaN(amount)) return { valid: false, error: "Invalid transfer amount" };
+    if (amount > currentBal) return { valid: false, error: "Insufficient balance in source vault" };
+    const warning = from === "emergency" ? "Emergency Vault drawdown warning" : null;
+    return { valid: true, warning, error: null };
+  }
+
+  it("should prevent transferring from a vault to itself", () => {
+    const res = validateTransfer("basic", "basic", 5000, 20000);
+    assert.equal(res.valid, false);
+    assert.match(res.error!, /cannot be identical/);
+  });
+
+  it("should prevent overdraft transfers beyond available vault balance", () => {
+    const res = validateTransfer("basic", "invest", 50000, 20000);
+    assert.equal(res.valid, false);
+    assert.match(res.error!, /Insufficient balance/);
+  });
+
+  it("should trigger caution warning when withdrawing from Emergency Vault", () => {
+    const res = validateTransfer("emergency", "invest", 10000, 50000);
+    assert.equal(res.valid, true);
+    assert.ok(res.warning);
+    assert.match(res.warning!, /Emergency Vault drawdown/);
+  });
+});
+
+/* ── 10. Allocation Matrix Validation & Constraints ──────── */
+describe("Allocation Matrix Constraints", () => {
+  function validateMatrix(basic: number, emergency: number, personal: number, invest: number): boolean {
+    return (basic + emergency + personal + invest) === 100;
+  }
+
+  it("should accept valid 50/15/15/20 configuration", () => {
+    assert.equal(validateMatrix(50, 15, 15, 20), true);
+  });
+
+  it("should reject configurations that deviate from 100%", () => {
+    assert.equal(validateMatrix(50, 15, 15, 25), false); // 105%
+    assert.equal(validateMatrix(40, 15, 15, 20), false); // 90%
+  });
+});
