@@ -208,21 +208,35 @@ export default function VaultsPage() {
       {/* Vaults Section */}
       <div className="space-y-4 animate-fade-up-delay-1">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-foreground">Your Vaults</h3>
+          <div className="flex items-center gap-2">
+            <span className="emr-indicator-code">PROTOCOL MOH-720</span>
+            <h3 className="text-sm font-bold text-foreground uppercase tracking-wide">
+              Custody Compartments & Reserve Allocations
+            </h3>
+          </div>
           <button
             onClick={() => setShowTransfer(!showTransfer)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold border border-[var(--border)] bg-white text-foreground hover:bg-muted transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold border border-[var(--border)] bg-white text-foreground hover:bg-muted transition-colors rounded-none"
           >
-            <ArrowRightLeft className="h-4 w-4" />
-            Transfer Funds
+            <ArrowRightLeft className="h-3.5 w-3.5" />
+            Inter-Vault Voucher
           </button>
         </div>
 
-        {/* Transfer form */}
+        {/* Transfer form (KenyaEMR Inter-Vault Protocol) */}
         {showTransfer && (
           <div className="bg-white border border-[var(--border)] animate-scale-in" style={{ borderTop: `3px solid #0043ce` }}>
-            <div className="px-6 py-4 border-b border-[var(--border)] bg-[#f4f4f4]">
-              <p className="text-sm font-semibold text-foreground">Transfer Between Vaults</p>
+            <div className="px-6 py-4 border-b border-[var(--border)] bg-[#f4f4f4] flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="emr-indicator-code">FORM MOH-720</span>
+                  <p className="text-sm font-bold text-foreground">Inter-Vault Custody Transfer Voucher</p>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Reallocate capital reserves between designated asset compartments</p>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-[#0043ce] bg-blue-50 border border-blue-200 px-2 py-1">
+                INTERNAL TRANSFER
+              </span>
             </div>
             <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
@@ -281,10 +295,11 @@ export default function VaultsPage() {
 
         {/* Vault cards grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {VAULT_CONFIGS.map((vault) => {
+          {VAULT_CONFIGS.map((vault, idx) => {
             const Icon = vault.icon;
             const balance = balances[vault.id] || 0;
             const progress = Math.min(100, Math.round((balance / vault.target) * 100));
+            const vaultCode = `VAULT-0${idx + 1}`;
             return (
               <div
                 key={vault.id}
@@ -298,7 +313,10 @@ export default function VaultsPage() {
                         <Icon className="h-5 w-5" style={{ color: vault.color }} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-foreground">{vault.label}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="emr-indicator-code">{vaultCode}</span>
+                          <p className="text-sm font-bold text-foreground">{vault.label}</p>
+                        </div>
                         <p className="text-xs text-muted-foreground">{vault.subtitle}</p>
                       </div>
                     </div>

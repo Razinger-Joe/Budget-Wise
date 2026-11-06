@@ -104,6 +104,18 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-5">
+      {/* ── TaifaCare Surveillance Header ────────────────── */}
+      <div className="flex items-center justify-between pb-1">
+        <div className="flex items-center gap-2">
+          <span className="emr-indicator-code">SURVEILLANCE MOH-711</span>
+          <h3 className="text-sm font-bold text-foreground uppercase tracking-wide">
+            Treasury Epidemiology & Monthly Surveillance
+          </h3>
+        </div>
+        <span className="text-[10px] font-mono text-muted-foreground hidden sm:inline">
+          REPORTING INTERVAL: MONTHLY COHORT AUDIT
+        </span>
+      </div>
 
       {/* KPI Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-fade-up">
