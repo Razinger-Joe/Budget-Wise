@@ -1,396 +1,540 @@
 <!DOCTYPE html>
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Your Vaults | Budget-Wise</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#00ff88",
-                        "coral": "#ff7f50",
-                        "background-light": "#f5f8f7",
-                        "background-dark": "#0a0f0d",
-                        "obsidian": "#050807",
-                    },
-                    fontFamily: {
-                        "display": ["Manrope", "sans-serif"]
-                    },
-                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
-                    animation: {
-                        'fade-up': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'float-slow': 'floatSlow 15s ease-in-out infinite',
-                        'float-slower': 'floatSlow 20s ease-in-out infinite reverse',
-                        'draw-line': 'drawLine 2s ease-out forwards',
-                    },
-                    keyframes: {
-                        fadeUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        floatSlow: {
-                            '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                        },
-                        drawLine: {
-                            '0%': { strokeDashoffset: '200' },
-                            '100%': { strokeDashoffset: '0' },
-                        }
-                    }
-                },
-            },
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Protocol MOH-720: Reserve Custody &amp; Inter-Vault Transfers | Budget-Wise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"IBM Plex Sans"', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'monospace'],
+          },
+          colors: {
+            kenya: {
+              DEFAULT: '#006A4E',
+              dark: '#004F3A',
+              deep: '#003328',
+              light: '#E6F5F1',
+              accent: '#E8A020',
+              red: '#BA1B1B'
+            }
+          }
         }
-    </script>
-<style>
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .glass-panel:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-        .vault-card {
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            transform-style: preserve-3d;
-        }
-        .vault-card:hover {
-            transform: perspective(1500px) rotateX(2deg) rotateY(-2deg) scale(1.02);
-            box-shadow: -10px 10px 30px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1) !important;
-        }
-        .orb {
-            filter: blur(120px);
-            position: absolute;
-            z-index: 0;
-            border-radius: 9999px;
-            opacity: 0.3;
-        }
-        
-        .projection-line {
-            stroke-dasharray: 200;
-            stroke-dashoffset: 200;
-        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background-color: #f4f4f4;
+      color: #161616;
+      margin: 0;
+      padding: 0;
+    }
+    .font-mono { font-family: 'IBM Plex Mono', monospace; }
+    
+    .emr-flag-strip {
+      height: 3px;
+      background: linear-gradient(
+        to right,
+        #000000 0%, #000000 25%,
+        #BA1B1B 25%, #BA1B1B 50%,
+        #006A4E 50%, #006A4E 75%,
+        #E8A020 75%, #E8A020 100%
+      );
+    }
+    
+    .emr-utility-strip {
+      background: #1f2937;
+      color: #d1d5db;
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    
+    .emr-dossier-banner {
+      background: #ffffff;
+      border: 1px solid #c6c6c6;
+      border-left: 5px solid #006A4E;
+    }
+    
+    .emr-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .emr-table th {
+      background: #004F3A;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 8px 12px;
+      text-align: left;
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+    .emr-table td {
+      padding: 7px 12px;
+      border-bottom: 1px solid #e0e0e0;
+      border-right: 1px solid #e0e0e0;
+    }
+    .emr-table tr:nth-child(even) td {
+      background: #fafafa;
+    }
+    .emr-table tr:hover td {
+      background: #f0f7f4;
+    }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 255, 136, 0.4); /* Primary color */
-        }
-        
-        /* Utility classes for animation delays */
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        .delay-500 { animation-delay: 500ms; }
-        
-        /* Hide element initially for fade-up animation */
-        .animate-fade-up {
-            opacity: 0;
-        }
-    </style>
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(2px);
+    }
+  </style>
 </head>
-<body class="bg-obsidian font-display text-slate-100 min-h-screen overflow-x-hidden custom-scrollbar scroll-smooth selection:bg-primary selection:text-obsidian relative">
-<!-- Ambient Background Orbs -->
-<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-<div class="orb bg-primary w-[500px] h-[500px] -top-24 -left-24 animate-float-slow"></div>
-<div class="orb bg-violet-600 w-[600px] h-[600px] top-1/2 -right-48 animate-float-slower"></div>
-<div class="orb bg-emerald-500 w-[400px] h-[400px] bottom-[-10%] left-1/4 animate-float-slow"></div>
-</div>
-<div class="relative z-10 flex flex-col min-h-screen">
-<!-- Top Navigation (Standardized) -->
-<header class="flex items-center justify-between mt-4 mx-6 mb-8 glass-panel px-6 py-4 rounded-3xl sticky top-4 z-50 animate-fade-up">
-<div class="flex items-center gap-3 group cursor-pointer" onclick="window.location.href='index.html'">
-<div class="size-9 bg-primary/20 rounded-lg flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-background-dark transition-all duration-300 shadow-[0_0_15px_rgba(0,255,136,0.2)] group-hover:shadow-[0_0_20px_rgba(0,255,136,0.4)]">
-<span class="material-symbols-outlined font-bold group-hover:scale-110 transition-transform">account_balance_wallet</span>
-</div>
-<h2 class="text-xl font-extrabold tracking-tight text-white group-hover:text-primary transition-colors">Budget<span class="text-primary group-hover:text-white transition-colors">-Wise</span></h2>
-</div>
-<div class="flex items-center gap-4">
-<nav class="hidden md:flex items-center gap-1 mr-6">
-<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="index.html">Dashboard</a>
-<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="income.html">Income</a>
-<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="expense.html">Expenses</a>
-<a class="px-4 py-2 text-sm font-medium text-primary bg-primary/10 rounded-lg shadow-[0_0_10px_rgba(0,255,136,0.1)] flex items-center gap-1" href="vaults.html"><span class="material-symbols-outlined text-[16px]">encrypted</span> Vaults</a>
-</nav>
-<button class="size-10 flex items-center justify-center rounded-xl glass hover:bg-white/10 hover:text-primary transition-all group">
-<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">notifications</span>
-</button>
-<div class="size-10 rounded-full border-2 border-primary/30 p-0.5 hover:border-primary transition-colors cursor-pointer shadow-[0_0_10px_rgba(0,255,136,0.1)] hover:shadow-[0_0_15px_rgba(0,255,136,0.3)] group">
-<img alt="User Profile" class="rounded-full w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="User profile avatar wearing professional attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA6Bp6UtyIz2iDa_RO3WadQHvuRMkE809H4-s0J5FHz1_JofeK0FqCH8ExexPOyK-YaJUZkRmavAxt02mQzSlbNIYjlKZytwNEaeHG9IGqrZT-n5amenaYQcurqTt4MF8naXLGRcQ4k36NmmEErNPOJu9plYkp5yqTTdYqyrls-Wx05LFAHt4qJwE1WvTxA5LOPbwM35ufB73v6bckwdXvNX-ZNTETeZI6gnAgmMhAPCFlokKpfW_RVHu6l6mEyjItiYrOF9xq0YsT"/>
-</div>
-</div>
-</header>
-<main class="flex-1 max-w-7xl mx-auto w-full px-6 py-6 pb-20">
-<!-- Header Section -->
-<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fade-up delay-100">
-<div>
-<h1 class="text-4xl md:text-5xl font-extrabold text-slate-100 tracking-tight mb-3">Your Vaults</h1>
-<p class="text-slate-400 text-lg max-w-2xl font-medium tracking-wide">Precision capital allocation for your financial future. Track growth and compound yields across your dedicated liquidity pools.</p>
-</div>
-<button class="bg-gradient-to-r from-emerald-500 to-primary text-background-dark font-extrabold px-8 py-4 rounded-2xl flex items-center gap-2 transition-all duration-300 shadow-[0_10px_30px_-10px_rgba(0,255,136,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(0,255,136,0.6)] hover:-translate-y-1 active:scale-95 shrink-0">
-<span class="material-symbols-outlined text-background-dark">add_circle</span>
-                    Create New Vault
-                </button>
-</div>
-<!-- Vaults Grid -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-<!-- Vault Card: Basic Needs (Teal) -->
-<div class="vault-card group relative overflow-hidden rounded-3xl glass-panel p-8 animate-fade-up delay-200 hover:border-teal-500/30">
-<div class="absolute top-0 right-0 p-8">
-<span class="material-symbols-outlined text-teal-400/10 text-8xl scale-150 rotate-12 group-hover:text-teal-400/20 group-hover:rotate-6 transition-all duration-500">receipt_long</span>
-</div>
-<div class="relative z-10 flex flex-col h-full">
-<div class="flex items-center gap-4 mb-8">
-<div class="w-14 h-14 rounded-2xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center group-hover:bg-teal-500/20 transition-colors shadow-[0_0_15px_rgba(20,184,166,0.1)] group-hover:shadow-[0_0_25px_rgba(20,184,166,0.2)]">
-<span class="material-symbols-outlined text-teal-400 text-3xl">home</span>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-slate-100 tracking-tight">Basic Needs</h3>
-<p class="text-slate-400 text-sm font-medium tracking-wide">Essential Living Expenses</p>
-</div>
-</div>
-<div class="mb-10">
-<p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-1 group-hover:text-teal-400/80 transition-colors">Current Balance</p>
-<h4 class="text-4xl md:text-5xl font-black text-slate-100 tracking-tight font-mono">KSH 45,000.00</h4>
-<div class="flex items-center gap-2 mt-2 text-teal-400 font-semibold bg-teal-500/10 w-fit px-3 py-1.5 rounded-lg border border-teal-500/20 shadow-[0_0_10px_rgba(20,184,166,0.05)]">
-<span class="material-symbols-outlined text-sm">trending_up</span>
-<p class="text-sm">Monthly Allocation: KSH 15,000</p>
-</div>
-</div>
-<!-- Compound Projection Panel -->
-<div class="mt-auto bg-slate-900/60 rounded-2xl p-5 border border-slate-800/80 backdrop-blur-md group-hover:border-teal-500/20 transition-colors duration-300">
-<div class="flex items-center justify-between mb-4">
-<div>
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">5-Year Projection</p>
-<p class="text-teal-400 text-xl font-bold font-mono group-hover:scale-105 transition-transform duration-300 origin-left">+12% Est.</p>
-</div>
-<div class="text-right">
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Potential Yield</p>
-<p class="text-slate-100 text-xl font-bold font-mono group-hover:text-teal-50 transition-colors">+KSH 12,450</p>
-</div>
-</div>
-<div class="h-16 w-full opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-<svg class="w-full h-full text-teal-500 fill-none stroke-current stroke-[3px] filter drop-shadow-[0_0_8px_rgba(20,184,166,0.6)]" viewbox="0 0 200 60">
-<path class="projection-line animate-draw-line delay-500" d="M0 50 C 20 48, 40 55, 60 45 S 100 20, 140 30 S 180 5, 200 10" stroke-linecap="round"></path>
-</svg>
-</div>
-</div>
-<button class="mt-6 w-full py-4 bg-teal-500/10 hover:bg-teal-500/20 text-teal-400 font-bold rounded-2xl border border-teal-500/30 transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(20,184,166,0.15)] group/btn">
-<span class="material-symbols-outlined text-xl group-hover/btn:-translate-y-1 transition-transform">payments</span>
-                            Add Funds
-                        </button>
-</div>
-</div>
-<!-- Vault Card: Emergency Fund (Violet) -->
-<div class="vault-card group relative overflow-hidden rounded-3xl glass-panel p-8 animate-fade-up delay-300 hover:border-violet-500/30">
-<div class="absolute top-0 right-0 p-8">
-<span class="material-symbols-outlined text-violet-400/10 text-8xl scale-150 rotate-12 group-hover:text-violet-400/20 group-hover:rotate-6 transition-all duration-500">health_and_safety</span>
-</div>
-<div class="relative z-10 flex flex-col h-full">
-<div class="flex items-center gap-4 mb-8">
-<div class="w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center group-hover:bg-violet-500/20 transition-colors shadow-[0_0_15px_rgba(139,92,246,0.1)] group-hover:shadow-[0_0_25px_rgba(139,92,246,0.2)]">
-<span class="material-symbols-outlined text-violet-400 text-3xl">emergency</span>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-slate-100 tracking-tight">Emergency Fund</h3>
-<p class="text-slate-400 text-sm font-medium tracking-wide">Security &amp; Safety Net</p>
-</div>
-</div>
-<div class="mb-10">
-<p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-1 group-hover:text-violet-400/80 transition-colors">Current Balance</p>
-<h4 class="text-4xl md:text-5xl font-black text-slate-100 tracking-tight font-mono">KSH 120,000.00</h4>
-<div class="flex items-center gap-2 mt-2 text-violet-400 font-semibold bg-violet-500/10 w-fit px-3 py-1.5 rounded-lg border border-violet-500/20 shadow-[0_0_10px_rgba(139,92,246,0.05)]">
-<span class="material-symbols-outlined text-sm">trending_up</span>
-<p class="text-sm">Monthly Allocation: KSH 10,000</p>
-</div>
-</div>
-<!-- Compound Projection Panel -->
-<div class="mt-auto bg-slate-900/60 rounded-2xl p-5 border border-slate-800/80 backdrop-blur-md group-hover:border-violet-500/20 transition-colors duration-300">
-<div class="flex items-center justify-between mb-4">
-<div>
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">5-Year Projection</p>
-<p class="text-violet-400 text-xl font-bold font-mono group-hover:scale-105 transition-transform duration-300 origin-left">+8% Est.</p>
-</div>
-<div class="text-right">
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Potential Yield</p>
-<p class="text-slate-100 text-xl font-bold font-mono group-hover:text-violet-50 transition-colors">+KSH 8,200</p>
-</div>
-</div>
-<div class="h-16 w-full opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-<svg class="w-full h-full text-violet-500 fill-none stroke-current stroke-[3px] filter drop-shadow-[0_0_8px_rgba(139,92,246,0.6)]" viewbox="0 0 200 60">
-<path class="projection-line animate-draw-line delay-500" d="M0 55 Q 50 45, 100 40 T 200 20" stroke-linecap="round"></path>
-</svg>
-</div>
-</div>
-<button class="mt-6 w-full py-4 bg-violet-500/10 hover:bg-violet-500/20 text-violet-400 font-bold rounded-2xl border border-violet-500/30 transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(139,92,246,0.15)] group/btn">
-<span class="material-symbols-outlined text-xl group-hover/btn:-translate-y-1 transition-transform">payments</span>
-                            Add Funds
-                        </button>
-</div>
-</div>
-<!-- Vault Card: Personal Savings (Amber) -->
-<div class="vault-card group relative overflow-hidden rounded-3xl glass-panel p-8 animate-fade-up delay-200 hover:border-amber-500/30">
-<div class="absolute top-0 right-0 p-8">
-<span class="material-symbols-outlined text-amber-400/10 text-8xl scale-150 rotate-12 group-hover:text-amber-400/20 group-hover:rotate-6 transition-all duration-500">savings</span>
-</div>
-<div class="relative z-10 flex flex-col h-full">
-<div class="flex items-center gap-4 mb-8">
-<div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center group-hover:bg-amber-500/20 transition-colors shadow-[0_0_15px_rgba(245,158,11,0.1)] group-hover:shadow-[0_0_25px_rgba(245,158,11,0.2)]">
-<span class="material-symbols-outlined text-amber-400 text-3xl">account_balance</span>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-slate-100 tracking-tight">Personal Savings</h3>
-<p class="text-slate-400 text-sm font-medium tracking-wide">Long-term Growth Portfolio</p>
-</div>
-</div>
-<div class="mb-10">
-<p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-1 group-hover:text-amber-400/80 transition-colors">Current Balance</p>
-<h4 class="text-4xl md:text-5xl font-black text-slate-100 tracking-tight font-mono">KSH 85,000.00</h4>
-<div class="flex items-center gap-2 mt-2 text-amber-400 font-semibold bg-amber-500/10 w-fit px-3 py-1.5 rounded-lg border border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.05)]">
-<span class="material-symbols-outlined text-sm">trending_up</span>
-<p class="text-sm">Monthly Allocation: KSH 5,000</p>
-</div>
-</div>
-<!-- Compound Projection Panel -->
-<div class="mt-auto bg-slate-900/60 rounded-2xl p-5 border border-slate-800/80 backdrop-blur-md group-hover:border-amber-500/20 transition-colors duration-300">
-<div class="flex items-center justify-between mb-4">
-<div>
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">5-Year Projection</p>
-<p class="text-amber-400 text-xl font-bold font-mono group-hover:scale-105 transition-transform duration-300 origin-left">+15% Est.</p>
-</div>
-<div class="text-right">
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Potential Yield</p>
-<p class="text-slate-100 text-xl font-bold font-mono group-hover:text-amber-50 transition-colors">+KSH 15,300</p>
-</div>
-</div>
-<div class="h-16 w-full opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-<svg class="w-full h-full text-amber-500 fill-none stroke-current stroke-[3px] filter drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" viewbox="0 0 200 60">
-<path class="projection-line animate-draw-line delay-500" d="M0 58 L 40 45 L 80 50 L 120 30 L 160 35 L 200 5" stroke-linecap="round" stroke-linejoin="round"></path>
-</svg>
-</div>
-</div>
-<button class="mt-6 w-full py-4 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-bold rounded-2xl border border-amber-500/30 transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] group/btn">
-<span class="material-symbols-outlined text-xl group-hover/btn:-translate-y-1 transition-transform">payments</span>
-                            Add Funds
-                        </button>
-</div>
-</div>
-<!-- Vault Card: Pay Yourself (Emerald) -->
-<div class="vault-card group relative overflow-hidden rounded-3xl glass-panel p-8 animate-fade-up delay-300 hover:border-emerald-500/30">
-<div class="absolute top-0 right-0 p-8">
-<span class="material-symbols-outlined text-emerald-400/10 text-8xl scale-150 rotate-12 group-hover:text-emerald-400/20 group-hover:rotate-6 transition-all duration-500">rocket_launch</span>
-</div>
-<div class="relative z-10 flex flex-col h-full">
-<div class="flex items-center gap-4 mb-8">
-<div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors shadow-[0_0_15px_rgba(16,185,129,0.1)] group-hover:shadow-[0_0_25px_rgba(16,185,129,0.2)]">
-<span class="material-symbols-outlined text-emerald-400 text-3xl">diamond</span>
-</div>
-<div>
-<h3 class="text-2xl font-bold text-slate-100 tracking-tight">Pay Yourself</h3>
-<p class="text-slate-400 text-sm font-medium tracking-wide">Discretionary Wealth</p>
-</div>
-</div>
-<div class="mb-10">
-<p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-1 group-hover:text-emerald-400/80 transition-colors">Current Balance</p>
-<h4 class="text-4xl md:text-5xl font-black text-slate-100 tracking-tight font-mono">KSH 250,000.00</h4>
-<div class="flex items-center gap-2 mt-2 text-emerald-400 font-semibold bg-emerald-500/10 w-fit px-3 py-1.5 rounded-lg border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.05)]">
-<span class="material-symbols-outlined text-sm">trending_up</span>
-<p class="text-sm">Monthly Allocation: KSH 20,000</p>
-</div>
-</div>
-<!-- Compound Projection Panel -->
-<div class="mt-auto bg-slate-900/60 rounded-2xl p-5 border border-slate-800/80 backdrop-blur-md group-hover:border-emerald-500/20 transition-colors duration-300">
-<div class="flex items-center justify-between mb-4">
-<div>
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">5-Year Projection</p>
-<p class="text-emerald-400 text-xl font-bold font-mono group-hover:scale-105 transition-transform duration-300 origin-left">+22% Est.</p>
-</div>
-<div class="text-right">
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Potential Yield</p>
-<p class="text-slate-100 text-xl font-bold font-mono group-hover:text-emerald-50 transition-colors">+KSH 45,600</p>
-</div>
-</div>
-<div class="h-16 w-full opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-<svg class="w-full h-full text-emerald-500 fill-none stroke-current stroke-[3px] filter drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" viewbox="0 0 200 60">
-<path class="projection-line animate-draw-line delay-500" d="M0 55 C 30 50, 60 40, 90 45 S 150 10, 200 5" stroke-linecap="round"></path>
-</svg>
-</div>
-</div>
-<button class="mt-6 w-full py-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold rounded-2xl border border-emerald-500/30 transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] group/btn">
-<span class="material-symbols-outlined text-xl group-hover/btn:-translate-y-1 transition-transform">payments</span>
-                            Add Funds
-                        </button>
-</div>
-</div>
-</div>
-</main>
-<!-- Sidebar / Mini Analytics Footer -->
-<footer class="mt-auto glass-panel border-t border-slate-800/50 py-6 px-10 animate-fade-up delay-300 z-20">
-<div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-8">
-<div class="flex items-center gap-4">
-<div class="flex flex-col">
-<span class="text-slate-500 text-xs font-bold uppercase tracking-widest">Total Managed Assets</span>
-<span class="text-2xl font-black text-primary drop-shadow-[0_0_8px_rgba(0,255,136,0.3)]">KSH 500,000.00</span>
-</div>
-</div>
-<div class="flex gap-10">
-<div class="flex items-center gap-3">
-<div class="w-2 h-10 bg-teal-500 rounded-full shadow-[0_0_10px_rgba(20,184,166,0.6)]"></div>
-<div>
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Basic</p>
-<p class="text-slate-100 font-bold font-mono">9%</p>
-</div>
-</div>
-<div class="flex items-center gap-3">
-<div class="w-2 h-10 bg-violet-500 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.6)]"></div>
-<div>
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Emergency</p>
-<p class="text-slate-100 font-bold font-mono">24%</p>
-</div>
-</div>
-<div class="flex items-center gap-3">
-<div class="w-2 h-10 bg-amber-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.6)]"></div>
-<div>
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Savings</p>
-<p class="text-slate-100 font-bold font-mono">17%</p>
-</div>
-</div>
-<div class="flex items-center gap-3">
-<div class="w-2 h-10 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.6)]"></div>
-<div>
-<p class="text-slate-500 text-xs font-bold uppercase tracking-wider">Wealth</p>
-<p class="text-slate-100 font-bold font-mono">50%</p>
-</div>
-</div>
-</div>
-<div class="flex items-center gap-4 ml-auto">
-<span class="text-slate-400 text-sm font-medium">Last Synced: 2 mins ago</span>
-<button class="bg-slate-800/80 hover:bg-slate-700/80 text-white p-2 md:p-3 rounded-xl transition-all hover:text-primary group border border-slate-700">
-<span class="material-symbols-outlined group-hover:-rotate-180 transition-transform duration-500">sync</span>
-</button>
-</div>
-</div>
-</footer>
-</div>
-</body></html>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <div class="emr-flag-strip"></div>
+
+  <div class="emr-utility-strip px-4 py-1.5 flex flex-wrap items-center justify-between border-b border-gray-700">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 font-bold text-emerald-400">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        MFL #14022
+      </span>
+      <span class="text-gray-400">|</span>
+      <span>Protocol MOH-720 Reserve Custody Compartments</span>
+      <span class="text-gray-400">|</span>
+      <span class="text-blue-300">Custodial Integrity 100%</span>
+    </div>
+    <div class="flex items-center gap-4 text-[10px]">
+      <span class="text-gray-300">FY 2026/2027 Q3</span>
+      <span class="text-gray-400">|</span>
+      <span class="bg-emerald-900/80 text-emerald-200 px-2 py-0.5 rounded border border-emerald-700 font-semibold">STANDARDIZED EMIS</span>
+      <span class="text-gray-400">|</span>
+      <span id="liveTimestamp" class="text-gray-300">--:--:-- EAT</span>
+    </div>
+  </div>
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Institutional Sidebar -->
+    <aside class="w-64 bg-[#004F3A] text-white flex flex-col justify-between shrink-0 shadow-lg border-r border-[#003328]">
+      <div>
+        <div class="p-4 border-b border-emerald-800/60 bg-[#003328]">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded bg-emerald-600 flex items-center justify-center font-bold text-white shadow-inner">
+              <span class="material-symbols-outlined text-xl">account_balance</span>
+            </div>
+            <div>
+              <h1 class="font-bold text-sm tracking-tight leading-tight">BUDGET-WISE EMR</h1>
+              <p class="text-[10px] text-emerald-300 font-mono uppercase tracking-wider">MOH Treasury Protocol</p>
+            </div>
+          </div>
+        </div>
+
+        <nav class="p-3 space-y-1 text-xs font-medium">
+          <div class="px-3 py-1.5 text-[10px] uppercase tracking-wider text-emerald-300/70 font-mono font-bold">
+            Surveillance &amp; Registers
+          </div>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 rounded text-emerald-100 hover:bg-emerald-800/60 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-base">dashboard</span>
+            <span>Client Dashboard</span>
+          </a>
+          <a href="income.html" class="flex items-center gap-2.5 px-3 py-2 rounded text-emerald-100 hover:bg-emerald-800/60 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-base">payments</span>
+            <span>MOH-711 Inflow Form</span>
+          </a>
+          <a href="expense.html" class="flex items-center gap-2.5 px-3 py-2 rounded text-emerald-100 hover:bg-emerald-800/60 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-base">receipt_long</span>
+            <span>MOH-705 Outflows</span>
+          </a>
+          <a href="vaults.html" class="flex items-center gap-2.5 px-3 py-2 rounded bg-emerald-800 text-white font-semibold shadow-sm border border-emerald-600">
+            <span class="material-symbols-outlined text-base">shield_with_heart</span>
+            <span>MOH-720 Vault Reserves</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="p-3 border-t border-emerald-800/60 bg-[#003328]/80 text-[11px]">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-emerald-700 flex items-center justify-center font-bold text-xs text-white">
+            AM
+          </div>
+          <div class="leading-tight">
+            <div class="font-semibold text-white truncate">Alex Mbuthia</div>
+            <div class="text-[10px] text-emerald-300 font-mono">ID: 32890412 · Nairobi</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Work Area -->
+    <main class="flex-1 overflow-y-auto bg-[#f4f4f4] p-5 space-y-4">
+      
+      <!-- Master Client Dossier Banner -->
+      <section class="emr-dossier-banner p-3.5 shadow-sm rounded-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="flex items-start md:items-center gap-3">
+            <div class="w-12 h-12 bg-[#004F3A] text-white rounded flex items-center justify-center font-bold text-lg shrink-0 border border-emerald-700">
+              AM
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-base font-bold tracking-tight text-gray-900 uppercase">ALEX MBUTHIA</h2>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#E6F5F1] text-[#004F3A] border border-[#c2e2d6]">
+                  UPI: KE-BW-2026-89412
+                </span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                  PROTOCOL MOH-720 CUSTODY
+                </span>
+              </div>
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600 font-mono mt-1">
+                <span><strong>Total Capital in Custody:</strong> KES 2,149,500.00</span>
+                <span><strong>Emergency Preservation Status:</strong> ENFORCED</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="openTransferModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-[#006A4E] hover:bg-[#004F3A] text-white rounded shadow-sm transition-colors">
+              <span class="material-symbols-outlined text-sm">sync_alt</span>
+              <span>Inter-Vault Custody Transfer</span>
+            </button>
+            <a href="index.html" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium border border-gray-400 bg-white hover:bg-gray-50 text-gray-800 rounded shadow-sm">
+              <span class="material-symbols-outlined text-sm">arrow_back</span>
+              <span>Dashboard</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 Designated Vault Custody Compartments -->
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        
+        <!-- VAULT-01 -->
+        <div class="bg-white border-2 border-gray-300 rounded-sm p-4 shadow-sm hover:border-[#006A4E] transition-all">
+          <div class="flex items-center justify-between mb-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-gray-100 text-gray-800 border border-gray-300">
+              VAULT-01
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+              Unlocked
+            </span>
+          </div>
+          <h3 class="font-bold text-sm text-gray-900">Operational Liquidity</h3>
+          <p class="text-[11px] text-gray-500 font-mono mt-0.5">Needs &amp; Mandatory Overheads (50%)</p>
+
+          <div class="mt-4 pt-3 border-t border-gray-100">
+            <div class="text-[10px] uppercase font-bold text-gray-500 font-mono">Compartment Balance</div>
+            <div class="text-2xl font-bold font-mono text-gray-900 mt-1">KES 124,500</div>
+            <div class="w-full bg-gray-200 h-1.5 mt-2 rounded-full overflow-hidden">
+              <div class="bg-[#006A4E] h-full" style="width: 50%;"></div>
+            </div>
+          </div>
+          <div class="mt-3 text-[10px] text-gray-500 font-mono flex justify-between">
+            <span>Target: 50%</span>
+            <span class="text-emerald-700 font-bold">Liquid</span>
+          </div>
+        </div>
+
+        <!-- VAULT-02 (LOCKED) -->
+        <div class="bg-white border-2 border-emerald-600 rounded-sm p-4 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 right-0 bg-emerald-700 text-white text-[9px] font-mono font-bold px-3 py-0.5 uppercase tracking-widest rounded-bl">
+            PROTECTED
+          </div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">
+              VAULT-02
+            </span>
+            <span class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+              <span class="material-symbols-outlined text-[11px]">lock</span> Locked
+            </span>
+          </div>
+          <h3 class="font-bold text-sm text-emerald-900">Sovereign Emergency</h3>
+          <p class="text-[11px] text-emerald-700 font-mono mt-0.5">Safety Reserve (15% Allocation)</p>
+
+          <div class="mt-4 pt-3 border-t border-emerald-100">
+            <div class="text-[10px] uppercase font-bold text-emerald-800 font-mono">Compartment Balance</div>
+            <div class="text-2xl font-bold font-mono text-emerald-800 mt-1">KES 1,250,000</div>
+            <div class="w-full bg-emerald-100 h-1.5 mt-2 rounded-full overflow-hidden">
+              <div class="bg-emerald-600 h-full" style="width: 100%;"></div>
+            </div>
+          </div>
+          <div class="mt-3 text-[10px] text-emerald-700 font-mono flex justify-between">
+            <span>Runway: 8.2 Months</span>
+            <span class="font-bold">Protocol Compliant</span>
+          </div>
+        </div>
+
+        <!-- VAULT-03 -->
+        <div class="bg-white border-2 border-gray-300 rounded-sm p-4 shadow-sm hover:border-[#006A4E] transition-all">
+          <div class="flex items-center justify-between mb-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-gray-100 text-gray-800 border border-gray-300">
+              VAULT-03
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-blue-800 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+              Active Yield
+            </span>
+          </div>
+          <h3 class="font-bold text-sm text-gray-900">Capital Growth</h3>
+          <p class="text-[11px] text-gray-500 font-mono mt-0.5">Investment &amp; Securities (15%)</p>
+
+          <div class="mt-4 pt-3 border-t border-gray-100">
+            <div class="text-[10px] uppercase font-bold text-gray-500 font-mono">Compartment Balance</div>
+            <div class="text-2xl font-bold font-mono text-blue-800 mt-1">KES 680,000</div>
+            <div class="w-full bg-gray-200 h-1.5 mt-2 rounded-full overflow-hidden">
+              <div class="bg-blue-600 h-full" style="width: 75%;"></div>
+            </div>
+          </div>
+          <div class="mt-3 text-[10px] text-gray-500 font-mono flex justify-between">
+            <span>Compounding: 14.2% p.a.</span>
+            <span class="text-blue-700 font-bold">NSE / Bonds</span>
+          </div>
+        </div>
+
+        <!-- VAULT-04 -->
+        <div class="bg-white border-2 border-gray-300 rounded-sm p-4 shadow-sm hover:border-[#006A4E] transition-all">
+          <div class="flex items-center justify-between mb-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-gray-100 text-gray-800 border border-gray-300">
+              VAULT-04
+            </span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+              Discretionary
+            </span>
+          </div>
+          <h3 class="font-bold text-sm text-gray-900">Discretionary Buffer</h3>
+          <p class="text-[11px] text-gray-500 font-mono mt-0.5">Flexible Quality of Life (20%)</p>
+
+          <div class="mt-4 pt-3 border-t border-gray-100">
+            <div class="text-[10px] uppercase font-bold text-gray-500 font-mono">Compartment Balance</div>
+            <div class="text-2xl font-bold font-mono text-amber-700 mt-1">KES 95,000</div>
+            <div class="w-full bg-gray-200 h-1.5 mt-2 rounded-full overflow-hidden">
+              <div class="bg-amber-500 h-full" style="width: 35%;"></div>
+            </div>
+          </div>
+          <div class="mt-3 text-[10px] text-gray-500 font-mono flex justify-between">
+            <span>Buffer Ceiling: KES 150k</span>
+            <span class="text-amber-700 font-bold">Unencumbered</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Protocol MOH-720 Custody Transfer Registry Table -->
+      <section class="bg-white border border-gray-300 rounded-sm p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="text-sm font-bold uppercase tracking-tight text-gray-900 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[#006A4E] text-base">swap_horiz</span>
+              Protocol MOH-720 Inter-Vault Transfer Ledger
+            </h3>
+            <p class="text-xs text-gray-500">Official log of capital reallocation between designated treasury compartments.</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-gray-300 rounded-sm">
+          <table class="emr-table" id="vaultTransferTable">
+            <thead>
+              <tr>
+                <th style="width: 105px;">Date</th>
+                <th style="width: 130px;">Transfer Ref</th>
+                <th>Source Compartment</th>
+                <th style="width: 25px; text-align: center;">-&gt;</th>
+                <th>Destination Compartment</th>
+                <th style="width: 130px; text-align: right;">Amount (KES)</th>
+                <th style="width: 100px; text-align: center;">Audit Clearance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-mono text-gray-600">2026-10-31</td>
+                <td class="font-mono font-bold text-[#004F3A]">TRF-2026-0012</td>
+                <td>
+                  <span class="font-mono text-gray-800">VAULT-01: Operational Liquidity</span>
+                </td>
+                <td class="text-center font-bold text-gray-400">→</td>
+                <td>
+                  <span class="font-mono text-emerald-800 font-bold">VAULT-02: Sovereign Emergency [LOCKED]</span>
+                </td>
+                <td class="font-mono font-bold text-right text-blue-700">35,000.00</td>
+                <td class="text-center">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    AUTHORIZED
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-mono text-gray-600">2026-10-15</td>
+                <td class="font-mono font-bold text-[#004F3A]">TRF-2026-0011</td>
+                <td>
+                  <span class="font-mono text-gray-800">VAULT-04: Discretionary Buffer</span>
+                </td>
+                <td class="text-center font-bold text-gray-400">→</td>
+                <td>
+                  <span class="font-mono text-blue-800 font-bold">VAULT-03: Capital Growth</span>
+                </td>
+                <td class="font-mono font-bold text-right text-blue-700">20,000.00</td>
+                <td class="text-center">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    AUTHORIZED
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Interactive Inter-Vault Custody Transfer Voucher Modal -->
+  <div id="transferModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center p-4 z-50">
+    <div class="bg-white border-2 border-[#004F3A] rounded shadow-2xl max-w-lg w-full p-6 text-gray-900">
+      <div class="emr-flag-strip mb-3"></div>
+      <div class="flex items-center justify-between border-b pb-2 mb-3">
+        <div>
+          <h4 class="font-bold text-sm uppercase text-[#004F3A]">PROTOCOL MOH-720 · CUSTODY TRANSFER VOUCHER</h4>
+          <p class="text-[10px] font-mono text-gray-500">Authorized Capital Reallocation Order</p>
+        </div>
+        <button onclick="closeTransferModal()" class="text-gray-400 hover:text-gray-700">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form id="transferForm" onsubmit="handleTransferSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Debited Source Compartment *</label>
+          <select id="modalSourceVault" required class="w-full px-3 py-1.5 border border-gray-300 rounded font-mono">
+            <option value="VAULT-01: Operational Liquidity">VAULT-01: Operational Liquidity (KES 124,500)</option>
+            <option value="VAULT-04: Discretionary Buffer">VAULT-04: Discretionary Buffer (KES 95,000)</option>
+            <option value="VAULT-03: Capital Growth">VAULT-03: Capital Growth (KES 680,000)</option>
+            <option value="VAULT-02: Sovereign Emergency">VAULT-02: Sovereign Emergency (KES 1,250,000 - LOCKED)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Credited Destination Compartment *</label>
+          <select id="modalDestVault" required class="w-full px-3 py-1.5 border border-gray-300 rounded font-mono">
+            <option value="VAULT-02: Sovereign Emergency [LOCKED]">VAULT-02: Sovereign Emergency [LOCKED]</option>
+            <option value="VAULT-03: Capital Growth">VAULT-03: Capital Growth</option>
+            <option value="VAULT-01: Operational Liquidity">VAULT-01: Operational Liquidity</option>
+            <option value="VAULT-04: Discretionary Buffer">VAULT-04: Discretionary Buffer</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Transfer Capital Amount (KES) *</label>
+          <input 
+            type="number" 
+            id="modalTransferAmount" 
+            required 
+            min="100" 
+            step="100"
+            placeholder="15000" 
+            class="w-full px-3 py-1.5 border-2 border-emerald-600 rounded font-mono font-bold text-sm"
+          />
+        </div>
+
+        <div>
+          <label class="block font-semibold text-gray-700 mb-1">Treasury Justification / Reason *</label>
+          <input 
+            type="text" 
+            id="modalTransferReason" 
+            required 
+            placeholder="e.g. End of month emergency vault buffer replenishment" 
+            class="w-full px-3 py-1.5 border border-gray-300 rounded"
+          />
+        </div>
+
+        <div class="p-2 bg-emerald-50 border border-emerald-200 rounded text-[11px] text-emerald-900 font-mono">
+          Audit Authorization: Supervisor clearance cryptographic token generated on commit.
+        </div>
+
+        <div class="mt-4 flex gap-2 justify-end">
+          <button type="submit" class="px-4 py-2 text-xs font-bold bg-[#006A4E] text-white rounded hover:bg-[#004F3A]">
+            Execute Custody Transfer Order
+          </button>
+          <button type="button" onclick="closeTransferModal()" class="px-3 py-2 text-xs border border-gray-300 rounded text-gray-700 hover:bg-gray-100">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const eat = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Africa/Nairobi',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      }).format(now);
+      const el = document.getElementById('liveTimestamp');
+      if (el) el.textContent = eat + ' EAT';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function openTransferModal() {
+      const modal = document.getElementById('transferModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeTransferModal() {
+      const modal = document.getElementById('transferModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function handleTransferSubmit(e) {
+      e.preventDefault();
+      const src = document.getElementById('modalSourceVault').value;
+      const dst = document.getElementById('modalDestVault').value;
+      const amount = parseFloat(document.getElementById('modalTransferAmount').value) || 0;
+
+      if (src.split(':')[0] === dst.split(':')[0]) {
+        alert('Validation Error: Source and Destination compartments cannot be identical.');
+        return;
+      }
+
+      if (src.includes('VAULT-02')) {
+        const proceed = confirm('CAUTION: Withdrawing from VAULT-02 (Sovereign Emergency Reserve) breaches Protocol MOH-720 covenants. Proceed with emergency override?');
+        if (!proceed) return;
+      }
+
+      const dateStr = new Date().toISOString().split('T')[0];
+      const voucherNum = 'TRF-2026-0' + Math.floor(13 + Math.random() * 50);
+
+      const tableBody = document.querySelector('#vaultTransferTable tbody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="font-mono text-gray-600">${dateStr}</td>
+        <td class="font-mono font-bold text-[#004F3A]">${voucherNum}</td>
+        <td><span class="font-mono text-gray-800">${src.split('(')[0]}</span></td>
+        <td class="text-center font-bold text-gray-400">→</td>
+        <td><span class="font-mono text-emerald-800 font-bold">${dst}</span></td>
+        <td class="font-mono font-bold text-right text-blue-700">${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+        <td class="text-center">
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+            AUTHORIZED
+          </span>
+        </td>
+      `;
+      tableBody.insertBefore(tr, tableBody.firstChild);
+
+      alert(`Protocol MOH-720 Custody Transfer of KES ${amount.toLocaleString()} successfully authorized!\nTransfer Voucher Ref: ${voucherNum}`);
+      closeTransferModal();
+      document.getElementById('transferForm').reset();
+    }
+  </script>
+</body>
+</html>
