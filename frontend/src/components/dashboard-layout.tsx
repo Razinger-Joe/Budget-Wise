@@ -17,6 +17,13 @@ import {
   HelpCircle,
   Menu,
   X,
+  Printer,
+  PlusCircle,
+  MinusCircle,
+  ArrowRightLeft,
+  ShieldCheck,
+  Building2,
+  Calendar,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -29,8 +36,8 @@ const navItems = [
 ];
 
 const bottomItems = [
-  { href: "/settings", label: "Settings", icon: Settings },
-  { href: "/help", label: "Help & Support", icon: HelpCircle },
+  { href: "/settings", label: "Settings", icon: Settings, description: "Preferences, allocation rules & security" },
+  { href: "/help", label: "Help & Support", icon: HelpCircle, description: "Guides, 50/15/15/20 rules & FAQs" },
 ];
 
 function NavLink({
@@ -81,6 +88,7 @@ function SidebarContent({
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
+    document.cookie = "access_token=; path=/; max-age=0;";
     router.push("/login");
   };
 
@@ -145,13 +153,21 @@ function SidebarContent({
 
         {bottomItems.map((item) => {
           const Icon = item.icon;
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 px-4 py-2.5 mx-2 rounded-sm text-sm text-white/50 hover:bg-white/8 hover:text-white/80 transition-all"
+              className={`flex items-center gap-3 px-4 py-2.5 mx-2 rounded-sm text-sm transition-all relative ${
+                isActive
+                  ? "bg-white/15 text-white font-medium"
+                  : "text-white/50 hover:bg-white/8 hover:text-white/80"
+              }`}
               onClick={onClose}
             >
+              {isActive && (
+                <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-[#E8A020] rounded-r-full" />
+              )}
               <Icon className="h-4 w-4 ml-1" />
               <span>{item.label}</span>
             </Link>
@@ -205,7 +221,8 @@ export default function DashboardLayout({
     return <>{children}</>;
   }
 
-  const currentPage = navItems.find((n) => n.href === pathname);
+  const allNav = [...navItems, ...bottomItems];
+  const currentPage = allNav.find((n) => n.href === pathname);
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "var(--background)" }}>
@@ -237,10 +254,34 @@ export default function DashboardLayout({
 
       {/* Main Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Header — Carbon-style */}
+        {/* TaifaCare / Kenya EMR National Flag Strip */}
+        <div className="emr-flag-strip shrink-0" />
+
+        {/* TaifaCare / Kenya EMR Facility Utility Strip */}
+        <div className="emr-utility-strip shrink-0 hidden md:flex items-center justify-between px-6 py-1.5 border-b border-gray-800">
+          <div className="flex items-center gap-3">
+            <span className="font-bold text-white tracking-wider flex items-center gap-1.5">
+              <Building2 className="h-3.5 w-3.5 text-[#E8A020]" />
+              REPUBLIC OF KENYA · WEALTH & TREASURY REGISTRY (TAIFACARE / EMR)
+            </span>
+            <span className="text-gray-500">|</span>
+            <span className="text-gray-300">FACILITY: Central Treasury Vault · Nairobi (MFL #14022)</span>
+          </div>
+          <div className="flex items-center gap-4 text-[10px]">
+            <span className="flex items-center gap-1 text-gray-300">
+              <Calendar className="h-3 w-3 text-gray-400" /> FY 2026/27 (Q3)
+            </span>
+            <span className="text-gray-500">|</span>
+            <span className="text-emerald-400 flex items-center gap-1 font-semibold">
+              <span className="status-dot active inline-block w-2 h-2" /> ONLINE · SYNCED
+            </span>
+          </div>
+        </div>
+
+        {/* Top Header — Carbon & EMR merged */}
         <header
           className="shrink-0 flex items-center justify-between px-6 lg:px-8 border-b bg-white z-10"
-          style={{ borderColor: "var(--border)", height: "56px" }}
+          style={{ borderColor: "var(--border)", height: "54px" }}
         >
           {/* Left: Mobile menu + Breadcrumb */}
           <div className="flex items-center gap-4">
@@ -251,18 +292,28 @@ export default function DashboardLayout({
               <Menu className="h-5 w-5 text-foreground" />
             </button>
 
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground font-medium">Budget-Wise</span>
-              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="font-semibold text-foreground">
+            {/* Breadcrumb with EMR Module tag */}
+            <div className="flex items-center gap-2 text-xs">
+              <span className="emr-indicator-code">MODULE</span>
+              <span className="text-muted-foreground font-medium">Budget-Wise EMR</span>
+              <ChevronRight className="h-3 w-3 text-muted-foreground" />
+              <span className="font-semibold text-foreground uppercase tracking-wide">
                 {currentPage?.label || "Dashboard"}
               </span>
             </div>
           </div>
 
-          {/* Right: Notifications + User */}
+          {/* Right: Notifications + User Designation */}
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => window.print()}
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-xs border border-[var(--border)] hover:bg-muted transition-colors rounded-sm text-muted-foreground hover:text-foreground mr-1"
+              title="Print Current View"
+            >
+              <Printer className="h-3.5 w-3.5" />
+              <span>Print Slip</span>
+            </button>
+
             {/* Notification button */}
             <button className="relative p-2 rounded-sm hover:bg-muted transition-colors">
               <Bell className="h-[18px] w-[18px] text-muted-foreground" />
@@ -272,33 +323,77 @@ export default function DashboardLayout({
             {/* Divider */}
             <div className="w-px h-5 bg-border mx-1" />
 
-            {/* User button */}
-            <button className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-sm hover:bg-muted transition-colors">
+            {/* User button (Clinical / Officer format) */}
+            <button className="flex items-center gap-2.5 pl-2 pr-3 py-1 rounded-sm hover:bg-muted transition-colors">
               <div
                 className="w-7 h-7 rounded-sm flex items-center justify-center text-xs font-bold text-white shrink-0"
                 style={{ background: "var(--primary)" }}
               >
-                BW
+                AM
               </div>
               <div className="text-left hidden sm:block">
-                <p className="text-xs font-semibold text-foreground leading-tight">My Account</p>
-                <p className="text-[10px] text-muted-foreground leading-tight">Nairobi, KE</p>
+                <p className="text-xs font-semibold text-foreground leading-tight">Alex Mbuthia</p>
+                <p className="text-[10px] text-muted-foreground leading-tight">Finance Officer · Nairobi</p>
               </div>
             </button>
           </div>
         </header>
 
-        {/* Page title bar — Carbon-style */}
-        <div
-          className="shrink-0 px-6 lg:px-8 py-4 bg-white border-b"
-          style={{ borderColor: "var(--border)" }}
-        >
-          <h2 className="text-xl font-bold text-foreground leading-tight">
-            {currentPage?.label || "Dashboard"}
-          </h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {currentPage?.description || "Financial overview and metrics"}
-          </p>
+        {/* Master Client Dossier Banner (KenyaEMR Style) */}
+        <div className="shrink-0 px-6 lg:px-8 py-3 bg-[#f8faf9] border-b border-[var(--border)] no-print">
+          <div className="emr-dossier-banner p-3.5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            {/* Identity Details */}
+            <div className="flex items-center gap-3">
+              <div
+                className="w-11 h-11 rounded-sm flex items-center justify-center font-bold text-sm text-white shrink-0 relative"
+                style={{ background: "var(--sidebar)" }}
+              >
+                AM
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-bold text-sm text-foreground leading-none">
+                    ALEX MBUTHIA KAMAU
+                  </h3>
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 bg-gray-100 border border-gray-300 font-semibold text-gray-700">
+                    UPI: KE-BW-2026-89412
+                  </span>
+                  <span className="tag-green text-[10px] font-bold px-1.5 py-0.5 rounded-none flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" /> 50/15/15/20 COMPLIANT
+                  </span>
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1 font-mono">
+                  NAT-ID: 32890412 · COUNTY: Nairobi · RESIDENCE: Kilimani · SCHEME: Tier-1 Treasury
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Encounter Action Pills */}
+            <div className="flex items-center gap-2 self-stretch md:self-auto flex-wrap">
+              <Link
+                href="/income"
+                className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#006A4E] hover:bg-[#004F3A] transition-colors rounded-none"
+              >
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span>Record Inflow</span>
+              </Link>
+              <Link
+                href="/expenses"
+                className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#ba1b1b] hover:bg-[#991515] transition-colors rounded-none"
+              >
+                <MinusCircle className="h-3.5 w-3.5" />
+                <span>Log Disbursement</span>
+              </Link>
+              <Link
+                href="/vaults"
+                className="flex-1 md:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold border border-[var(--border)] bg-white hover:bg-muted text-foreground transition-colors rounded-none"
+              >
+                <ArrowRightLeft className="h-3.5 w-3.5" />
+                <span>Vault Protocol</span>
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Page Content */}

@@ -306,3 +306,88 @@
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* ===== TAIFACARE / KENYA EMR SIGNATURE UI ===== */
+/* Kenya national micro-strip: Black, Red, Green, White flag line */
+.emr-flag-strip {
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    #000000 0%, #000000 25%,
+    #BA1B1B 25%, #BA1B1B 50%,
+    #006A4E 50%, #006A4E 75%,
+    #E8A020 75%, #E8A020 100%
+  );
+}
+
+/* Facility utility strip */
+.emr-utility-strip {
+  background: #1f2937;
+  color: #d1d5db;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* Client dossier / Master Patient Banner */
+.emr-dossier-banner {
+  background: #ffffff;
+  border: 1px solid var(--border-strong);
+  border-left: 4px solid var(--primary);
+}
+
+/* Clinical registry table */
+.emr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.emr-table th {
+  background: #004F3A;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 8px 12px;
+  text-align: left;
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+.emr-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.emr-table tr:nth-child(even) td {
+  background: #fafafa;
+}
+.emr-table tr:hover td {
+  background: #f0f7f4;
+}
+
+/* Indicator code badge (e.g. MOH 711 / BW-IND-01) */
+.emr-indicator-code {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: #e8f4f0;
+  color: #004F3A;
+  border: 1px solid #c2e2d6;
+  border-radius: 2px;
+}
+
+/* Print voucher formatting */
+@media print {
+  aside, header, .no-print {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .emr-dossier-banner {
+    border: 1px solid #000 !important;
+    margin-bottom: 12px !important;
+  }
+}

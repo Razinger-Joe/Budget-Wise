@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import {
   TrendingUp, Plus, Calendar, DollarSign, ArrowUpRight,
-  FileText, ChevronDown, ChevronUp, Info,
+  FileText, ChevronDown, ChevronUp, Info, Search, Printer,
+  Download, Building2, ShieldCheck,
 } from "lucide-react";
 import { incomeAPI } from "@/lib/api";
 
@@ -41,6 +42,9 @@ export default function IncomePage() {
   const [amount, setAmount]           = useState("");
   const [dateReceived, setDateReceived] = useState("");
   const [notes, setNotes]             = useState("");
+  const [channel, setChannel]         = useState("M-PESA Paybill");
+  const [refCode, setRefCode]         = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchIncome = async () => {
     setLoading(true);
@@ -63,10 +67,11 @@ export default function IncomePage() {
     }
     setSaving(true);
     setError("");
+    const combinedNotes = [notes, channel ? `Channel: ${channel}` : "", refCode ? `Ref: ${refCode}` : ""].filter(Boolean).join(" · ");
     try {
-      await incomeAPI.create({ source, amount: Number(amount), date_received: dateReceived, notes });
+      await incomeAPI.create({ source, amount: Number(amount), date_received: dateReceived, notes: combinedNotes });
       setShowForm(false);
-      setSource(""); setAmount(""); setDateReceived(""); setNotes("");
+      setSource(""); setAmount(""); setDateReceived(""); setNotes(""); setRefCode("");
       await fetchIncome();
     } catch {
       setError("Failed to save income. Please try again.");

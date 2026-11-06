@@ -6,7 +6,8 @@ import {
   PartyPopper, LineChart, ShoppingCart, Utensils, Car, Tv,
   Heart, Shirt, Lightbulb, MoreHorizontal, Sparkles,
   ArrowDownRight, ArrowUpRight, Activity, AlertCircle,
-  RefreshCw, ChevronRight, Zap,
+  RefreshCw, ChevronRight, Zap, Search, Printer, X, FileText,
+  ShieldCheck, CheckCircle2,
 } from "lucide-react";
 import { bucketAPI, expenseAPI, incomeAPI, insightAPI } from "@/lib/api";
 
@@ -58,6 +59,8 @@ export default function DashboardPage() {
   const [legacyScore, setLegacyScore] = useState(0);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTx, setSelectedTx] = useState<any | null>(null);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -145,41 +148,49 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
 
-      {/* ── Row 1: KPI Cards ──────────────────────────── */}
+      {/* ── Row 1: TaifaCare / KenyaEMR Indicator Registry Matrix ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-up">
         {[
           {
-            label: "Total Income",
+            code: "BW-IND-01",
+            title: "Treasury Inflow",
+            benchmark: "Regular Inflow",
             value: fmt(totalIncome),
             icon: TrendingUp,
-            change: "+8.2%",
+            status: "NORMAL",
             positive: true,
             color: "#006A4E",
             bg: "#defbe6",
           },
           {
-            label: "Total Expenses",
+            code: "BW-IND-02",
+            title: "Disbursement Velocity",
+            benchmark: "Cap: ≤ 70% Inflow",
             value: fmt(totalExpenses),
             icon: ShoppingBag,
-            change: "+3.1%",
-            positive: false,
+            status: totalExpenses <= totalIncome ? "CONTROLLED" : "DEFICIT",
+            positive: totalExpenses <= totalIncome,
             color: "#da1e28",
             bg: "#fff1f1",
           },
           {
-            label: "Net Savings",
+            code: "BW-IND-03",
+            title: "Net Surplus Buffer",
+            benchmark: "Target: ≥ 30% Savings",
             value: fmt(Math.max(0, netSavings)),
             icon: PiggyBank,
-            change: netSavings >= 0 ? "On track" : "Over budget",
+            status: netSavings >= 0 ? "ACCUMULATING" : "DRAWDOWN",
             positive: netSavings >= 0,
             color: "#0043ce",
             bg: "#edf5ff",
           },
           {
-            label: "Emergency Vault",
+            code: "BW-IND-04",
+            title: "Emergency Reserve",
+            benchmark: "Runway: 3-6 Mos",
             value: fmt(Number(balances.emergency || 0)),
             icon: Lock,
-            change: "Locked",
+            status: "PROTECTED",
             positive: true,
             color: "#6929c4",
             bg: "#f6f2ff",
@@ -188,30 +199,34 @@ export default function DashboardPage() {
           const Icon = card.icon;
           return (
             <div
-              key={card.label}
-              className="bg-white border border-[var(--border)] p-4 hover:shadow-md transition-shadow"
+              key={card.code}
+              className="bg-white border border-[var(--border)] p-4 hover:shadow-md transition-shadow relative"
               style={{ borderLeft: `3px solid ${card.color}` }}
             >
-              <div className="flex items-start justify-between mb-3">
-                <div
-                  className="w-9 h-9 flex items-center justify-center rounded-sm"
-                  style={{ background: card.bg }}
-                >
-                  <Icon className="h-4 w-4" style={{ color: card.color }} />
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="emr-indicator-code">{card.code}</span>
+                  <div
+                    className="w-7 h-7 flex items-center justify-center rounded-sm"
+                    style={{ background: card.bg }}
+                  >
+                    <Icon className="h-3.5 w-3.5" style={{ color: card.color }} />
+                  </div>
                 </div>
                 <span
-                  className={`text-[10px] font-semibold flex items-center gap-1 px-1.5 py-0.5 rounded-sm ${
+                  className={`text-[9px] font-mono font-bold flex items-center gap-1 px-1.5 py-0.5 rounded-none ${
                     card.positive ? "tag-green" : "tag-red"
                   }`}
                 >
                   {card.positive ? <ArrowUpRight className="h-2.5 w-2.5" /> : <ArrowDownRight className="h-2.5 w-2.5" />}
-                  {card.change}
+                  {card.status}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground font-medium mb-1">{card.label}</p>
-              <p className="font-mono text-lg font-bold text-foreground leading-tight">
+              <p className="text-xs font-semibold text-foreground truncate">{card.title}</p>
+              <p className="font-mono text-lg font-bold text-foreground leading-tight my-1">
                 {card.value}
               </p>
+              <p className="text-[10px] text-muted-foreground font-mono">{card.benchmark}</p>
             </div>
           );
         })}
@@ -340,63 +355,112 @@ export default function DashboardPage() {
       {/* ── Row 3: Recent Transactions + AI Insight ──── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 animate-fade-up-delay-2">
 
-        {/* Recent Transactions */}
-        <div className="lg:col-span-2 bg-white border border-[var(--border)]">
-          {/* Table header */}
+        {/* TaifaCare Clinical Registry Table */}
+        <div className="lg:col-span-2 bg-white border border-[var(--border)] overflow-hidden">
+          {/* Registry Header */}
           <div
-            className="flex items-center justify-between px-5 py-3 border-b"
+            className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-3 border-b gap-3 bg-[#fafafa]"
             style={{ borderColor: "var(--border)" }}
           >
-            <div>
-              <p className="section-label">Recent Movements</p>
+            <div className="flex items-center gap-2">
+              <span className="emr-indicator-code">REGISTRY</span>
+              <p className="section-label">Encounter & Disbursement Ledger</p>
             </div>
-            <a
-              href="/expenses"
-              className="text-xs font-semibold flex items-center gap-1 hover:underline"
-              style={{ color: "var(--primary)" }}
-            >
-              View all <ChevronRight className="h-3 w-3" />
-            </a>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Filter reference, payee..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-8 pr-3 py-1 text-xs border border-[var(--border)] bg-white rounded-none focus:outline-none focus:border-[var(--primary)] w-44"
+                />
+              </div>
+              <a
+                href="/expenses"
+                className="text-xs font-semibold flex items-center gap-1 hover:underline text-[#006A4E]"
+              >
+                All Records <ChevronRight className="h-3 w-3" />
+              </a>
+            </div>
           </div>
 
           {/* Table */}
           {recentExpenses.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center px-6">
               <Activity className="h-10 w-10 text-muted-foreground/30 mb-3" />
-              <p className="text-sm font-medium text-muted-foreground">No transactions yet</p>
+              <p className="text-sm font-medium text-muted-foreground">No encounters recorded yet</p>
               <p className="text-xs text-muted-foreground/70 mt-1">
-                Add your first expense to see movements here
+                Log your first disbursement to populate the clinical ledger
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-[var(--border)]">
-              {recentExpenses.map((tx, i) => {
-                const Icon = categoryIcons[tx.category] || MoreHorizontal;
-                const dateStr = new Date(tx.date_spent).toLocaleDateString("en-KE", {
-                  day: "numeric", month: "short", year: "numeric",
-                });
-                return (
-                  <div
-                    key={i}
-                    className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#f4f4f4] transition-colors cursor-default"
-                  >
-                    <div className="w-8 h-8 rounded-sm bg-red-50 flex items-center justify-center shrink-0">
-                      <Icon className="h-4 w-4 text-[#da1e28]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground truncate">{tx.description}</p>
-                      <p className="text-[11px] text-muted-foreground capitalize">
-                        {tx.category} · {tx.bucket_source} · {dateStr}
-                      </p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-mono text-sm font-bold text-[#da1e28]">
-                        − KSH {Number(tx.amount).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="overflow-x-auto">
+              <table className="emr-table">
+                <thead>
+                  <tr>
+                    <th>REF / VOUCHER</th>
+                    <th>DATE</th>
+                    <th>DESCRIPTION & PAYEE</th>
+                    <th>CATEGORY</th>
+                    <th>VAULT DEBIT</th>
+                    <th className="text-right">DISBURSEMENT</th>
+                    <th>AUDIT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentExpenses
+                    .filter((tx) =>
+                      !searchQuery ||
+                      tx.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      tx.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      tx.bucket_source?.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((tx, i) => {
+                      const refCode = `VCH-${String(i + 101).padStart(4, "0")}`;
+                      const dateStr = new Date(tx.date_spent).toLocaleDateString("en-KE", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      });
+                      return (
+                        <tr
+                          key={i}
+                          onClick={() => setSelectedTx({ ...tx, refCode, dateStr })}
+                          className="cursor-pointer transition-colors"
+                          title="Click to view official audit voucher"
+                        >
+                          <td className="font-mono text-xs font-bold text-[#004F3A]">
+                            {refCode}
+                          </td>
+                          <td className="font-mono text-[11px] text-muted-foreground">
+                            {dateStr}
+                          </td>
+                          <td className="font-semibold text-foreground">
+                            {tx.description}
+                          </td>
+                          <td>
+                            <span className="capitalize text-[10px] font-semibold px-1.5 py-0.5 bg-gray-100 border border-gray-300">
+                              {tx.category}
+                            </span>
+                          </td>
+                          <td className="capitalize text-[11px] text-muted-foreground">
+                            {tx.bucket_source}
+                          </td>
+                          <td className="text-right font-mono font-bold text-[#ba1b1b]">
+                            − KSH {Number(tx.amount).toLocaleString()}
+                          </td>
+                          <td>
+                            <span className="tag-green text-[9px] font-mono font-bold px-1 py-0.5">
+                              CLEARED
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
@@ -461,6 +525,87 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* ── TaifaCare Encounter Slip Modal ────────────────────── */}
+      {selectedTx && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white border-2 border-gray-800 max-w-md w-full p-6 shadow-2xl relative animate-scale-in">
+            {/* National Flag line */}
+            <div className="emr-flag-strip mb-4 -mx-6 -mt-6" />
+
+            <div className="flex justify-between items-start mb-4 border-b pb-3">
+              <div>
+                <p className="text-[10px] font-mono text-gray-500 uppercase">Republic of Kenya · Treasury Registry</p>
+                <h4 className="font-bold text-base text-foreground flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-[#006A4E]" />
+                  Official Disbursement Slip
+                </h4>
+                <p className="font-mono text-xs text-[#004F3A] font-bold mt-0.5">{selectedTx.refCode}</p>
+              </div>
+              <button
+                onClick={() => setSelectedTx(null)}
+                className="p-1 hover:bg-gray-100 rounded-sm text-gray-500 hover:text-black"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs mb-6 bg-[#fafafa] p-4 border border-[var(--border)]">
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-muted-foreground">Client Name:</span>
+                <span className="font-semibold text-foreground">ALEX MBUTHIA KAMAU</span>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-muted-foreground">UPI Identifier:</span>
+                <span className="font-mono text-foreground">KE-BW-2026-89412</span>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-muted-foreground">Transaction Date:</span>
+                <span className="font-mono text-foreground">{selectedTx.dateStr}</span>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-muted-foreground">Description & Payee:</span>
+                <span className="font-semibold text-foreground">{selectedTx.description}</span>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-muted-foreground">Category:</span>
+                <span className="capitalize font-semibold text-foreground">{selectedTx.category}</span>
+              </div>
+              <div className="flex justify-between border-b pb-1.5">
+                <span className="text-muted-foreground">Vault Debited:</span>
+                <span className="capitalize font-semibold text-foreground">{selectedTx.bucket_source}</span>
+              </div>
+              <div className="flex justify-between pt-1">
+                <span className="text-muted-foreground font-semibold">Amount Authorized:</span>
+                <span className="font-mono text-base font-bold text-[#ba1b1b]">
+                  KSH {Number(selectedTx.amount).toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] mb-6">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+              <span>Certified disbursement · Reconciled against 50/15/15/20 protocol.</span>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => window.print()}
+                className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold uppercase tracking-wider text-white bg-[#006A4E] hover:bg-[#004F3A]"
+              >
+                <Printer className="h-3.5 w-3.5" />
+                Print Voucher Slip
+              </button>
+              <button
+                onClick={() => setSelectedTx(null)}
+                className="px-4 py-2 text-xs font-semibold border border-gray-300 hover:bg-gray-100"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

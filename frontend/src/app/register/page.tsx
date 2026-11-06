@@ -35,6 +35,7 @@ export default function RegisterPage() {
       const res = await authAPI.login(email, password);
       localStorage.setItem("access_token", res.data.access_token);
       if (res.data.refresh_token) localStorage.setItem("refresh_token", res.data.refresh_token);
+      document.cookie = `access_token=${res.data.access_token}; path=/; max-age=604800; SameSite=Lax`;
       router.push("/");
     } catch (err: any) {
       setError(err.response?.data?.detail || "Registration failed. Please try again.");
