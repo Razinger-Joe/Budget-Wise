@@ -5,8 +5,6 @@
   "description": "Personal Financial Surveillance and 50/15/15/20 Custody Management System adopting the KenyaEMR and TaifaCare institutional design standards.",
   "scripts": {
     "dev": "npm --prefix frontend run dev",
-    "build": "npm --prefix frontend run build",
-    "start": "npm --prefix frontend run start",
     "test": "npm --prefix frontend test"
   },
   "keywords": [
