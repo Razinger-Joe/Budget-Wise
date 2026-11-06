@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import {
   Receipt, Plus, ShoppingCart, Utensils, Car, Tv,
   Heart, Shirt, Lightbulb, Home, MoreHorizontal,
-  ArrowDownRight, FileText, Info, ChevronUp,
+  ArrowDownRight, FileText, Info, ChevronUp, Search,
+  ShieldAlert, AlertTriangle, Printer,
 } from "lucide-react";
 import { expenseAPI } from "@/lib/api";
 
@@ -57,9 +58,12 @@ export default function ExpensesPage() {
   const [description, setDescription] = useState("");
   const [amount, setAmount]           = useState("");
   const [category, setCategory]       = useState("");
-  const [bucketSource, setBucketSource] = useState("");
+  const [bucketSource, setBucketSource] = useState("basic");
   const [dateSpent, setDateSpent]     = useState("");
   const [notes, setNotes]             = useState("");
+  const [channel, setChannel]         = useState("M-PESA");
+  const [voucherCode, setVoucherCode] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchExpenses = async () => {
     setLoading(true);
@@ -82,10 +86,11 @@ export default function ExpensesPage() {
     }
     setSaving(true);
     setError("");
+    const combinedNotes = [notes, channel ? `Channel: ${channel}` : "", voucherCode ? `Voucher: ${voucherCode}` : ""].filter(Boolean).join(" · ");
     try {
-      await expenseAPI.create({ description, amount: Number(amount), category, bucket_source: bucketSource, date_spent: dateSpent, notes });
+      await expenseAPI.create({ description, amount: Number(amount), category, bucket_source: bucketSource, date_spent: dateSpent, notes: combinedNotes });
       setShowForm(false);
-      setDescription(""); setAmount(""); setCategory(""); setBucketSource(""); setDateSpent(""); setNotes("");
+      setDescription(""); setAmount(""); setCategory(""); setBucketSource("basic"); setDateSpent(""); setNotes(""); setVoucherCode("");
       await fetchExpenses();
     } catch {
       setError("Failed to save expense.");
@@ -199,107 +204,243 @@ export default function ExpensesPage() {
         </button>
       </div>
 
-      {/* Add Expense Form */}
+      {/* Add Expense Form (KenyaEMR Encounter Format) */}
       {showForm && (
-        <div className="bg-white border border-[var(--border)] animate-scale-in" style={{ borderTop: `3px solid #da1e28` }}>
-          <div className="px-6 py-4 border-b border-[var(--border)] bg-[#f4f4f4]">
-            <p className="text-sm font-semibold text-foreground">New Expense</p>
-            <p className="text-xs text-muted-foreground">Record a spending transaction</p>
+        <div className="bg-white border border-[var(--border)] animate-scale-in" style={{ borderTop: `3px solid #ba1b1b` }}>
+          <div className="px-6 py-4 border-b border-[var(--border)] bg-[#f4f4f4] flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="emr-indicator-code">FORM MOH-705</span>
+                <p className="text-sm font-bold text-foreground">Disbursement Encounter Voucher</p>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">Record an authorized outflow against allocated wealth vaults</p>
+            </div>
+            <span className="text-[10px] font-mono font-bold text-[#ba1b1b] bg-red-50 border border-red-200 px-2 py-1">
+              DISBURSEMENT
+            </span>
           </div>
-          <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+          {/* Emergency Vault Alert */}
+          {bucketSource === "emergency" && (
+            <div className="mx-6 mt-4 p-3 bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
+              <span>
+                <strong>Warning:</strong> Emergency Vault is designated for crisis reserves. Tapping this vault flags an advisory audit event.
+              </span>
+            </div>
+          )}
+
+          <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">Description <span className="text-[#da1e28]">*</span></label>
-              <input type="text" placeholder="e.g. Grocery shopping" className="w-full border border-[var(--border)] bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--primary)] transition-colors" value={description} onChange={(e) => setDescription(e.target.value)} />
+              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">
+                Payee & Description <span className="text-[#da1e28]">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Nairobi Water, Carrefour, Naivas"
+                className="w-full border border-[var(--border)] bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--primary)] rounded-none"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">Amount (KSH) <span className="text-[#da1e28]">*</span></label>
-              <input type="number" placeholder="0" className="w-full border border-[var(--border)] bg-white px-3 py-2.5 text-sm font-mono text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--primary)] transition-colors" value={amount} onChange={(e) => setAmount(e.target.value)} />
+              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">
+                Amount (KSH) <span className="text-[#da1e28]">*</span>
+              </label>
+              <input
+                type="number"
+                placeholder="0"
+                className="w-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-mono text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--primary)] rounded-none font-bold text-[#ba1b1b]"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">Category <span className="text-[#da1e28]">*</span></label>
-              <select className="w-full border border-[var(--border)] bg-white px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-[var(--primary)] transition-colors" value={category} onChange={(e) => setCategory(e.target.value)}>
+              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">
+                Expenditure Category <span className="text-[#da1e28]">*</span>
+              </label>
+              <select
+                className="w-full border border-[var(--border)] bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[var(--primary)] rounded-none"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
                 <option value="">Select category…</option>
                 {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">Source Bucket <span className="text-[#da1e28]">*</span></label>
-              <select className="w-full border border-[var(--border)] bg-white px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-[var(--primary)] transition-colors" value={bucketSource} onChange={(e) => setBucketSource(e.target.value)}>
-                <option value="">Select bucket…</option>
+              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">
+                Debit Vault Source <span className="text-[#da1e28]">*</span>
+              </label>
+              <select
+                className="w-full border border-[var(--border)] bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[var(--primary)] rounded-none"
+                value={bucketSource}
+                onChange={(e) => setBucketSource(e.target.value)}
+              >
                 {BUCKETS.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">Date <span className="text-[#da1e28]">*</span></label>
-              <input type="date" className="w-full border border-[var(--border)] bg-white px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-[var(--primary)] transition-colors" value={dateSpent} onChange={(e) => setDateSpent(e.target.value)} />
+              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">
+                Disbursement Channel
+              </label>
+              <select
+                className="w-full border border-[var(--border)] bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[var(--primary)] rounded-none"
+                value={channel}
+                onChange={(e) => setChannel(e.target.value)}
+              >
+                <option value="M-PESA">M-PESA (Paybill / Buy Goods)</option>
+                <option value="Bank EFT">Bank EFT / Debit Card</option>
+                <option value="Cash Voucher">Cash Voucher / Treasury Outflow</option>
+              </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">Notes</label>
-              <input type="text" placeholder="Optional note…" className="w-full border border-[var(--border)] bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--primary)] transition-colors" value={notes} onChange={(e) => setNotes(e.target.value)} />
+              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">
+                Voucher / Reference #
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. VCH-9410"
+                className="w-full border border-[var(--border)] bg-white px-3 py-2 text-sm font-mono text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--primary)] rounded-none uppercase"
+                value={voucherCode}
+                onChange={(e) => setVoucherCode(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">
+                Date Authorized <span className="text-[#da1e28]">*</span>
+              </label>
+              <input
+                type="date"
+                className="w-full border border-[var(--border)] bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:border-[var(--primary)] rounded-none"
+                value={dateSpent}
+                onChange={(e) => setDateSpent(e.target.value)}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-foreground mb-1.5 uppercase tracking-wider">
+                Notes & Justification
+              </label>
+              <input
+                type="text"
+                placeholder="Add audit reference or vendor details…"
+                className="w-full border border-[var(--border)] bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[var(--primary)] rounded-none"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
             </div>
           </div>
           <div className="px-6 pb-6 flex gap-3">
-            <button onClick={handleSave} disabled={saving} className="px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60" style={{ background: "var(--primary)" }}>
-              {saving ? "Saving…" : "Save Expense"}
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-5 py-2 text-xs font-bold uppercase tracking-wider text-white disabled:opacity-60 rounded-none bg-[#ba1b1b] hover:bg-[#991515]"
+            >
+              {saving ? "Authorizing…" : "Authorize Outflow Voucher"}
             </button>
-            <button onClick={() => { setShowForm(false); setError(""); }} className="px-5 py-2.5 text-sm font-semibold border border-[var(--border)] bg-white text-foreground hover:bg-muted transition-colors">
+            <button
+              onClick={() => { setShowForm(false); setError(""); }}
+              className="px-4 py-2 text-xs font-semibold border border-[var(--border)] bg-white text-foreground hover:bg-muted transition-colors rounded-none"
+            >
               Cancel
             </button>
           </div>
         </div>
       )}
 
-      {/* Expense Table */}
-      <div className="bg-white border border-[var(--border)] animate-fade-up-delay-2 overflow-x-auto">
-        <div className="px-5 py-3 border-b border-[var(--border)] bg-[#f4f4f4] flex items-center justify-between">
-          <p className="section-label">Transactions</p>
-          <span className="text-xs text-muted-foreground">{filteredExpenses.length} records</span>
+      {/* Expense Table (TaifaCare Clinical Registry) */}
+      <div className="bg-white border border-[var(--border)] animate-fade-up-delay-2 overflow-hidden">
+        <div className="px-5 py-3 border-b border-[var(--border)] bg-[#fafafa] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="emr-indicator-code">REGISTRY</span>
+            <p className="section-label">Master Disbursement Ledger · MOH-705</p>
+            <span className="text-xs text-muted-foreground">({filteredExpenses.length} records)</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Filter description, notes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 pr-3 py-1 text-xs border border-[var(--border)] bg-white rounded-none focus:outline-none focus:border-[var(--primary)] w-48"
+              />
+            </div>
+          </div>
         </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr style={{ background: "#f4f4f4", borderBottom: "1px solid var(--border)" }}>
-              {["Description", "Amount", "Category", "Bucket", "Date"].map((h) => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[var(--border)]">
-            {filteredExpenses.length === 0 ? (
+
+        <div className="overflow-x-auto">
+          <table className="emr-table">
+            <thead>
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
-                  <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground/30" />
-                  No expenses recorded.
-                </td>
+                <th>VOUCHER REF</th>
+                <th>DATE</th>
+                <th>PAYEE & DESCRIPTION</th>
+                <th>CATEGORY</th>
+                <th>DEBIT VAULT</th>
+                <th className="text-right">DISBURSEMENT</th>
+                <th>STATUS</th>
               </tr>
-            ) : (
-              filteredExpenses.map((exp) => {
-                const Icon = categoryIcons[exp.category] || MoreHorizontal;
-                const cat = CATEGORIES.find((c) => c.id === exp.category);
-                return (
-                  <tr key={exp.id} className="hover:bg-[#f9f9f9] transition-colors">
-                    <td className="px-4 py-3 font-medium text-foreground">{exp.description}</td>
-                    <td className="px-4 py-3 font-mono font-bold text-[#da1e28]">
-                      − {fmt(exp.amount)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-semibold capitalize"
-                        style={{ background: cat?.bg || "#e8e8e8", color: cat?.color || "#6f6f6f" }}
-                      >
-                        <Icon className="h-3 w-3" />
-                        {exp.category}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground capitalize text-xs">{exp.bucket_source}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">{fmtDate(exp.date_spent)}</td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredExpenses.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground text-sm">
+                    <FileText className="h-8 w-8 mx-auto mb-2 text-muted-foreground/30" />
+                    No disbursements found for this criteria.
+                  </td>
+                </tr>
+              ) : (
+                filteredExpenses
+                  .filter((exp) =>
+                    !searchQuery ||
+                    exp.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    exp.notes?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    exp.category?.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((exp, idx) => {
+                    const Icon = categoryIcons[exp.category] || MoreHorizontal;
+                    const cat = CATEGORIES.find((c) => c.id === exp.category);
+                    return (
+                      <tr key={exp.id}>
+                        <td className="font-mono text-xs font-bold text-[#ba1b1b]">
+                          {`VCH-${String(idx + 1).padStart(4, "0")}`}
+                        </td>
+                        <td className="font-mono text-[11px] text-muted-foreground">
+                          {fmtDate(exp.date_spent)}
+                        </td>
+                        <td className="font-medium text-foreground">
+                          <div>{exp.description}</div>
+                          {exp.notes && <div className="text-[10px] text-muted-foreground font-mono">{exp.notes}</div>}
+                        </td>
+                        <td>
+                          <span
+                            className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-semibold capitalize border"
+                            style={{ background: cat?.bg || "#e8e8e8", color: cat?.color || "#6f6f6f", borderColor: `${cat?.color || "#888"}30` }}
+                          >
+                            <Icon className="h-3 w-3" />
+                            {exp.category}
+                          </span>
+                        </td>
+                        <td className="text-xs text-muted-foreground capitalize font-medium">
+                          {exp.bucket_source}
+                        </td>
+                        <td className="text-right font-mono font-bold text-[#ba1b1b]">
+                          − {fmt(exp.amount)}
+                        </td>
+                        <td>
+                          <span className="tag-green text-[9px] font-mono font-bold px-1 py-0.5">
+                            CLEARED
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
