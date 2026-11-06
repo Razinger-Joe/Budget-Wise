@@ -1,265 +1,497 @@
 <!DOCTYPE html>
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Log Income | Budget-Wise</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#00ff88",
-                        "background-light": "#f5f8f7",
-                        "background-dark": "#050a08", // Darker obsidian
-                    },
-                    fontFamily: {
-                        "display": ["Manrope", "sans-serif"],
-                        "mono": ["JetBrains Mono", "monospace"]
-                    },
-                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
-                    animation: {
-                        'fade-up': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'float-slow': 'floatSlow 15s ease-in-out infinite',
-                        'float-slower': 'floatSlow 20s ease-in-out infinite reverse',
-                    },
-                    keyframes: {
-                        fadeUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        floatSlow: {
-                            '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                        }
-                    }
-                },
-            },
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Form MOH-711: Treasury Inflow Protocol | Budget-Wise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"IBM Plex Sans"', 'sans-serif'],
+            mono: ['"IBM Plex Mono"', 'monospace'],
+          },
+          colors: {
+            kenya: {
+              DEFAULT: '#006A4E',
+              dark: '#004F3A',
+              deep: '#003328',
+              light: '#E6F5F1',
+              accent: '#E8A020',
+              red: '#BA1B1B'
+            }
+          }
         }
-    </script>
-<style>
-        .glass {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .glass:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-        .emerald-glow {
-            box-shadow: 0 -20px 50px -10px rgba(0, 255, 136, 0.15);
-        }
-        .bg-noise {
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.03;
-        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background-color: #f4f4f4;
+      color: #161616;
+      margin: 0;
+      padding: 0;
+    }
+    .font-mono { font-family: 'IBM Plex Mono', monospace; }
+    
+    .emr-flag-strip {
+      height: 3px;
+      background: linear-gradient(
+        to right,
+        #000000 0%, #000000 25%,
+        #BA1B1B 25%, #BA1B1B 50%,
+        #006A4E 50%, #006A4E 75%,
+        #E8A020 75%, #E8A020 100%
+      );
+    }
+    
+    .emr-utility-strip {
+      background: #1f2937;
+      color: #d1d5db;
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    
+    .emr-dossier-banner {
+      background: #ffffff;
+      border: 1px solid #c6c6c6;
+      border-left: 5px solid #006A4E;
+    }
+    
+    .emr-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .emr-table th {
+      background: #004F3A;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 8px 12px;
+      text-align: left;
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+    .emr-table td {
+      padding: 7px 12px;
+      border-bottom: 1px solid #e0e0e0;
+      border-right: 1px solid #e0e0e0;
+    }
+    .emr-table tr:nth-child(even) td {
+      background: #fafafa;
+    }
+    .emr-table tr:hover td {
+      background: #f0f7f4;
+    }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 255, 136, 0.4); /* Primary color */
-        }
-        
-        /* Utility classes for animation delays */
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        .delay-400 { animation-delay: 400ms; }
-        
-        /* Hide element initially for fade-up animation */
-        .animate-fade-up {
-            opacity: 0;
-        }
-    </style>
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(2px);
+    }
+  </style>
 </head>
-<body class="bg-background-dark font-display text-slate-100 min-h-screen relative overflow-x-hidden selection:bg-primary selection:text-background-dark custom-scrollbar scroll-smooth">
-<!-- Background Decor -->
-<div class="fixed inset-0 bg-noise pointer-events-none z-0"></div>
-<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full pointer-events-none z-0 animate-float-slow"></div>
-<div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-teal-900/20 blur-[150px] rounded-full pointer-events-none z-0 animate-float-slower"></div>
-<div class="relative z-10 flex flex-col min-h-screen">
-<!-- Navigation -->
-<header class="flex items-center justify-between px-6 py-4 border-b border-white/5 glass sticky top-0 z-50 animate-fade-up">
-<div class="flex items-center gap-3 group cursor-pointer" onclick="window.location.href='index.html'">
-<div class="size-9 bg-primary/20 rounded-lg flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-background-dark transition-all duration-300 shadow-[0_0_15px_rgba(0,255,136,0.2)] group-hover:shadow-[0_0_20px_rgba(0,255,136,0.4)]">
-<span class="material-symbols-outlined font-bold group-hover:scale-110 transition-transform">account_balance_wallet</span>
-</div>
-<h2 class="text-xl font-extrabold tracking-tight text-white group-hover:text-primary transition-colors">Budget<span class="text-primary group-hover:text-white transition-colors">-Wise</span></h2>
-</div>
-<div class="flex items-center gap-4">
-<nav class="hidden md:flex items-center gap-1 mr-6">
-<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="index.html">Dashboard</a>
-<a class="px-4 py-2 text-sm font-medium text-primary bg-primary/10 rounded-lg shadow-[0_0_10px_rgba(0,255,136,0.1)]" href="income.html">Income</a>
-<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all group flex items-center gap-1" href="expense.html"><span class="material-symbols-outlined text-[16px] group-hover:text-primary transition-colors">arrow_downward</span> Expenses</a>
-<a class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all group flex items-center gap-1" href="vaults.html"><span class="material-symbols-outlined text-[16px] group-hover:text-primary transition-colors">encrypted</span> Vaults</a>
-</nav>
-<button class="size-10 flex items-center justify-center rounded-xl glass hover:bg-white/10 hover:text-primary transition-all group">
-<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">notifications</span>
-</button>
-<div class="size-10 rounded-full border-2 border-primary/30 p-0.5 hover:border-primary transition-colors cursor-pointer shadow-[0_0_10px_rgba(0,255,136,0.1)] hover:shadow-[0_0_15px_rgba(0,255,136,0.3)] group">
-<img alt="User Profile" class="rounded-full w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Professional male portrait avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUwYgviXE9SrOyZCOzmjoKyZk2eucIi9m8ExVM44fGLCgyfgZg8LezTn9WViRYixoJ5p2YUXlw6oRz7xtYR3he5Aq3wCY4X_FSiYzalRrAg7hnLWEyyraOWKvHsWPbAPVHSH1Ze9OABAW-M9T8eesJ00qn3G33S_rw0nthd66LgW-HkQFxBBm5LGvlyjRRwdhlX2f5hUh2sPOpJRmjeKGimAjkUAdU7Y3WHCCtN7lAYrMAw5DIr7ep6OohTYQ1YyE107SQyC00rLe2"/>
-</div>
-</div>
-</header>
-<main class="flex-1 max-w-4xl mx-auto w-full px-6 py-12">
-<!-- Header Section -->
-<div class="text-center mb-10 animate-fade-up delay-100">
-<h1 class="text-4xl font-bold text-white mb-2 tracking-tight">Log Income</h1>
-<p class="text-slate-400 tracking-wide">Track your earnings and automate your savings split</p>
-</div>
-<!-- Main Form Card -->
-<div class="glass emerald-glow rounded-3xl p-8 mb-12 relative overflow-hidden animate-fade-up delay-200 group/card hover:border-primary/30 transition-colors duration-500">
-<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 group-hover/card:opacity-100 transition-opacity duration-500 shadow-[0_5px_15px_rgba(0,255,136,0.5)]"></div>
-<form class="space-y-8 relative z-10">
-<!-- Amount Input (JetBrains Mono) -->
-<div class="space-y-2 group/input">
-<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1 group-focus-within/input:text-primary transition-colors">Amount (KSH)</label>
-<div class="relative flex items-center">
-<span class="absolute left-6 text-2xl font-mono text-primary/50 group-focus-within/input:text-primary transition-colors duration-300">KSH</span>
-<input class="w-full bg-white/5 border border-transparent rounded-2xl py-8 pl-24 pr-6 text-5xl font-mono text-white focus:bg-white/10 focus:border-transparent focus:ring-2 focus:ring-primary/50 placeholder:text-white/10 transition-all duration-300 focus:shadow-[0_0_20px_rgba(0,255,136,0.1)]" placeholder="0.00" type="text"/>
-</div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<!-- Source -->
-<div class="space-y-2 group/source">
-<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1 group-focus-within/source:text-primary transition-colors">Income Source</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/source:text-primary transition-colors duration-300">work</span>
-<input class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:bg-white/10 focus:border-transparent focus:ring-2 focus:ring-primary/50 transition-all duration-300 focus:shadow-[0_0_15px_rgba(0,255,136,0.1)]" placeholder="e.g. Monthly Salary" type="text"/>
-</div>
-</div>
-<!-- Date -->
-<div class="space-y-2 group/date">
-<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1 group-focus-within/date:text-primary transition-colors">Received Date</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/date:text-primary transition-colors duration-300">calendar_today</span>
-<input class="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white focus:bg-white/10 focus:border-transparent focus:ring-2 focus:ring-primary/50 transition-all duration-300 [color-scheme:dark] focus:shadow-[0_0_15px_rgba(0,255,136,0.1)]" type="date"/>
-</div>
-</div>
-</div>
-<!-- Split Configuration Visualizer (Subtle) -->
-<div class="p-4 rounded-2xl bg-primary/5 border border-primary/20 flex items-center justify-between hover:bg-primary/10 transition-colors cursor-pointer group/split">
-<div class="flex items-center gap-3">
-<div class="bg-primary/20 p-2 rounded-lg group-hover/split:bg-primary group-hover/split:bg-opacity-30 transition-colors">
-<span class="material-symbols-outlined text-primary group-hover/split:animate-[spin_3s_linear_infinite]">auto_awesome</span>
-</div>
-<div>
-<p class="text-sm font-semibold text-slate-200 group-hover/split:text-white transition-colors">Smart Split Active</p>
-<p class="text-xs text-slate-400">50% Needs, 30% Wants, 20% Savings</p>
-</div>
-</div>
-<button class="text-xs font-bold text-primary hover:text-white hover:bg-primary/20 px-3 py-1.5 rounded-lg transition-all uppercase tracking-wider border border-transparent hover:border-primary/30" type="button">Customize</button>
-</div>
-<!-- Action Button -->
-<button class="w-full py-5 bg-gradient-to-r from-emerald-500 to-primary rounded-2xl text-background-dark font-extrabold text-lg shadow-[0_10px_30px_-10px_rgba(0,255,136,0.4)] hover:shadow-[0_15px_40px_-5px_rgba(0,255,136,0.6)] hover:-translate-y-1 transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2">
-<span class="material-symbols-outlined font-bold">add_circle</span> Split &amp; Log Income
-                    </button>
-</form>
-</div>
-<!-- History Table -->
-<div class="space-y-6 animate-fade-up delay-300">
-<div class="flex items-center justify-between px-2">
-<h3 class="text-xl font-bold text-white tracking-tight">Recent Income</h3>
-<button class="text-sm font-medium text-slate-400 hover:text-primary transition-colors flex items-center gap-1 group">
-                        View Full History <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-</button>
-</div>
-<div class="overflow-hidden rounded-2xl border border-white/5 glass">
-<table class="w-full border-collapse">
-<thead class="bg-white/5 border-b border-white/5">
-<tr>
-<th class="text-left py-5 px-6 text-xs font-bold uppercase tracking-widest text-slate-500">Source / Date</th>
-<th class="text-left py-5 px-6 text-xs font-bold uppercase tracking-widest text-slate-500">Split Breakdown</th>
-<th class="text-right py-5 px-6 text-xs font-bold uppercase tracking-widest text-slate-500">Total Amount</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-white/5">
-<!-- Row 1 -->
-<tr class="hover:bg-white/5 transition-all duration-300 group/row cursor-pointer hover:shadow-[inset_4px_0_0_0_rgba(0,255,136,0.8)]">
-<td class="py-5 px-6">
-<p class="font-bold text-white group-hover/row:text-primary transition-colors tracking-wide">Project Payment: UI Design</p>
-<p class="text-xs text-slate-500 mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">calendar_today</span> Oct 24, 2023</p>
-</td>
-<td class="py-5 px-6">
-<div class="flex flex-wrap gap-2">
-<span class="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-bold border border-blue-500/20 group-hover/row:border-blue-500/40 transition-colors">50% Needs</span>
-<span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20 group-hover/row:border-amber-500/40 transition-colors">30% Wants</span>
-<span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold border border-primary/20 group-hover/row:border-primary/40 transition-colors shadow-[0_0_10px_rgba(0,255,136,0.1)]">20% Savings</span>
-</div>
-</td>
-<td class="py-5 px-6 text-right group-hover/row:scale-105 transition-transform duration-300 origin-right">
-<p class="font-mono font-bold text-white text-lg group-hover/row:text-primary transition-colors">125,000.00</p>
-<p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">KSH</p>
-</td>
-</tr>
-<!-- Row 2 -->
-<tr class="hover:bg-white/5 transition-all duration-300 group/row cursor-pointer hover:shadow-[inset_4px_0_0_0_rgba(0,255,136,0.8)]">
-<td class="py-5 px-6">
-<p class="font-bold text-white group-hover/row:text-primary transition-colors tracking-wide">Monthly Base Salary</p>
-<p class="text-xs text-slate-500 mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">calendar_today</span> Oct 01, 2023</p>
-</td>
-<td class="py-5 px-6">
-<div class="flex flex-wrap gap-2">
-<span class="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-bold border border-blue-500/20 group-hover/row:border-blue-500/40 transition-colors">50% Needs</span>
-<span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20 group-hover/row:border-amber-500/40 transition-colors">30% Wants</span>
-<span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold border border-primary/20 group-hover/row:border-primary/40 transition-colors shadow-[0_0_10px_rgba(0,255,136,0.1)]">20% Savings</span>
-</div>
-</td>
-<td class="py-5 px-6 text-right group-hover/row:scale-105 transition-transform duration-300 origin-right">
-<p class="font-mono font-bold text-white text-lg group-hover/row:text-primary transition-colors">450,000.00</p>
-<p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">KSH</p>
-</td>
-</tr>
-<!-- Row 3 -->
-<tr class="hover:bg-white/5 transition-all duration-300 group/row cursor-pointer hover:shadow-[inset_4px_0_0_0_rgba(0,255,136,0.8)]">
-<td class="py-5 px-6">
-<p class="font-bold text-white group-hover/row:text-primary transition-colors tracking-wide">Upwork: Logo Refinement</p>
-<p class="text-xs text-slate-500 mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">calendar_today</span> Sep 18, 2023</p>
-</td>
-<td class="py-5 px-6">
-<div class="flex flex-wrap gap-2">
-<span class="px-2.5 py-1 rounded-full bg-white/10 text-slate-300 text-[10px] font-bold border border-white/20 group-hover/row:border-white/40 group-hover/row:text-white transition-colors">Full Savings</span>
-</div>
-</td>
-<td class="py-5 px-6 text-right group-hover/row:scale-105 transition-transform duration-300 origin-right">
-<p class="font-mono font-bold text-white text-lg group-hover/row:text-primary transition-colors">15,400.00</p>
-<p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">KSH</p>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</main>
-<!-- Footer -->
-<footer class="py-8 border-t border-white/5 glass mt-12 animate-fade-up delay-400">
-<div class="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-<p class="text-slate-500 text-xs font-medium tracking-wide">© 2024 Budget-Wise Financial OS. All rights reserved.</p>
-<div class="flex items-center gap-6">
-<a class="text-slate-500 hover:text-primary hover:scale-110 transition-all" href="#" title="Help"><span class="material-symbols-outlined text-sm">help_outline</span></a>
-<a class="text-slate-500 hover:text-primary hover:scale-110 transition-all" href="#" title="Settings"><span class="material-symbols-outlined text-sm">settings</span></a>
-<a class="text-slate-500 hover:text-red-400 hover:scale-110 transition-all" href="#" title="Logout"><span class="material-symbols-outlined text-sm">logout</span></a>
-</div>
-</div>
-</footer>
-</div>
-</body></html>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <div class="emr-flag-strip"></div>
+
+  <div class="emr-utility-strip px-4 py-1.5 flex flex-wrap items-center justify-between border-b border-gray-700">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 font-bold text-emerald-400">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        MFL #14022
+      </span>
+      <span class="text-gray-400">|</span>
+      <span>Form MOH-711 Treasury Inflow Protocol</span>
+      <span class="text-gray-400">|</span>
+      <span class="text-emerald-300">Cohort Triage Active</span>
+    </div>
+    <div class="flex items-center gap-4 text-[10px]">
+      <span class="text-gray-300">FY 2026/2027 Q3</span>
+      <span class="text-gray-400">|</span>
+      <span class="bg-emerald-900/80 text-emerald-200 px-2 py-0.5 rounded border border-emerald-700 font-semibold">STANDARDIZED EMIS</span>
+      <span class="text-gray-400">|</span>
+      <span id="liveTimestamp" class="text-gray-300">--:--:-- EAT</span>
+    </div>
+  </div>
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Institutional Sidebar -->
+    <aside class="w-64 bg-[#004F3A] text-white flex flex-col justify-between shrink-0 shadow-lg border-r border-[#003328]">
+      <div>
+        <div class="p-4 border-b border-emerald-800/60 bg-[#003328]">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded bg-emerald-600 flex items-center justify-center font-bold text-white shadow-inner">
+              <span class="material-symbols-outlined text-xl">account_balance</span>
+            </div>
+            <div>
+              <h1 class="font-bold text-sm tracking-tight leading-tight">BUDGET-WISE EMR</h1>
+              <p class="text-[10px] text-emerald-300 font-mono uppercase tracking-wider">MOH Treasury Protocol</p>
+            </div>
+          </div>
+        </div>
+
+        <nav class="p-3 space-y-1 text-xs font-medium">
+          <div class="px-3 py-1.5 text-[10px] uppercase tracking-wider text-emerald-300/70 font-mono font-bold">
+            Surveillance &amp; Registers
+          </div>
+          <a href="index.html" class="flex items-center gap-2.5 px-3 py-2 rounded text-emerald-100 hover:bg-emerald-800/60 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-base">dashboard</span>
+            <span>Client Dashboard</span>
+          </a>
+          <a href="income.html" class="flex items-center gap-2.5 px-3 py-2 rounded bg-emerald-800 text-white font-semibold shadow-sm border border-emerald-600">
+            <span class="material-symbols-outlined text-base">payments</span>
+            <span>MOH-711 Inflow Form</span>
+          </a>
+          <a href="expense.html" class="flex items-center gap-2.5 px-3 py-2 rounded text-emerald-100 hover:bg-emerald-800/60 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-base">receipt_long</span>
+            <span>MOH-705 Outflows</span>
+          </a>
+          <a href="vaults.html" class="flex items-center gap-2.5 px-3 py-2 rounded text-emerald-100 hover:bg-emerald-800/60 hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-base">shield_with_heart</span>
+            <span>MOH-720 Vault Reserves</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="p-3 border-t border-emerald-800/60 bg-[#003328]/80 text-[11px]">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-emerald-700 flex items-center justify-center font-bold text-xs text-white">
+            AM
+          </div>
+          <div class="leading-tight">
+            <div class="font-semibold text-white truncate">Alex Mbuthia</div>
+            <div class="text-[10px] text-emerald-300 font-mono">ID: 32890412 · Nairobi</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto bg-[#f4f4f4] p-5 space-y-4">
+      
+      <!-- Master Client Dossier Banner -->
+      <section class="emr-dossier-banner p-3.5 shadow-sm rounded-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="flex items-start md:items-center gap-3">
+            <div class="w-12 h-12 bg-[#004F3A] text-white rounded flex items-center justify-center font-bold text-lg shrink-0 border border-emerald-700">
+              AM
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-base font-bold tracking-tight text-gray-900 uppercase">ALEX MBUTHIA</h2>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#E6F5F1] text-[#004F3A] border border-[#c2e2d6]">
+                  UPI: KE-BW-2026-89412
+                </span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  FORM MOH-711 REGISTER
+                </span>
+              </div>
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-600 font-mono mt-1">
+                <span><strong>National ID:</strong> 32890412</span>
+                <span><strong>Encounter Rule:</strong> 50/15/15/20 Automated Triage</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <a href="index.html" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium border border-gray-400 bg-white hover:bg-gray-50 text-gray-800 rounded shadow-sm">
+              <span class="material-symbols-outlined text-sm">arrow_back</span>
+              <span>Back to Dashboard</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Form MOH-711 Inflow Capture & Live 50/15/15/20 Allocation Calculator -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Input Form -->
+        <div class="lg:col-span-7 bg-white border border-gray-300 rounded-sm p-4 shadow-sm">
+          <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-4">
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[#006A4E] text-base">input</span>
+                MOH-711 Treasury Inflow Capture Protocol
+              </h3>
+              <p class="text-[11px] text-gray-500">Record incoming treasury disbursements, client remittances, and institutional revenue.</p>
+            </div>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+              AUDIT READY
+            </span>
+          </div>
+
+          <form id="inflowForm" onsubmit="handleInflowSubmit(event)" class="space-y-3.5 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Inflow Source / Remitter Name *</label>
+                <input 
+                  type="text" 
+                  id="sourceInput" 
+                  required 
+                  placeholder="e.g. Ministry of Finance Retainer" 
+                  class="w-full px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#006A4E]"
+                />
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Inflow Category *</label>
+                <select id="categoryInput" class="w-full px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#006A4E]">
+                  <option value="Primary Salary / Retainer">Primary Salary / Retainer</option>
+                  <option value="Consultancy Dividend">Consultancy Dividend</option>
+                  <option value="Treasury Bond Yield">Treasury Bond Yield</option>
+                  <option value="Discretionary Remittance">Discretionary Remittance</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">Payment Channel *</label>
+                <select id="channelInput" class="w-full px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:border-[#006A4E]">
+                  <option value="M-PESA Paybill">M-PESA Paybill</option>
+                  <option value="Bank RTGS/EFT (KCB/Equity)">Bank RTGS/EFT (KCB/Equity)</option>
+                  <option value="Treasury Direct Cheque">Treasury Direct Cheque</option>
+                  <option value="Government Cash Disbursal">Government Cash Disbursal</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold text-gray-700 mb-1">M-Pesa / Bank Reference *</label>
+                <input 
+                  type="text" 
+                  id="refInput" 
+                  required 
+                  placeholder="e.g. QK8912KL99" 
+                  class="w-full px-3 py-1.5 border border-gray-300 rounded font-mono uppercase focus:outline-none focus:border-[#006A4E]"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-semibold text-gray-700 mb-1">Total Remittance Amount (KES) *</label>
+              <div class="relative">
+                <span class="absolute left-3 top-2 text-xs font-mono font-bold text-gray-500">KES</span>
+                <input 
+                  type="number" 
+                  id="amountInput" 
+                  required 
+                  min="100" 
+                  step="1"
+                  placeholder="100000" 
+                  class="w-full pl-12 pr-3 py-2 text-base border-2 border-emerald-600 rounded font-mono font-bold focus:outline-none focus:border-[#004F3A]"
+                  oninput="calculateTriageSplit(this.value)"
+                />
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" class="w-full py-2 bg-[#006A4E] hover:bg-[#004F3A] text-white font-bold rounded shadow transition-colors flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-sm">verified</span>
+                <span>Confirm &amp; Commit Inflow to Custody Registry</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Live 50/15/15/20 Triage Allocation Card -->
+        <div class="lg:col-span-5 bg-white border border-gray-300 rounded-sm p-4 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[#006A4E] text-base">alt_route</span>
+                Automated 50/15/15/20 Triage
+              </h3>
+              <span class="text-[10px] font-mono text-gray-500">Real-time Split</span>
+            </div>
+
+            <p class="text-[11px] text-gray-600 mb-3">
+              According to TaifaCare Financial Surveillance rules, each gross inflow is strictly partitioned into designated institutional vaults:
+            </p>
+
+            <div class="space-y-2.5 font-mono text-xs">
+              <!-- 50% Needs -->
+              <div class="p-2 rounded bg-gray-50 border border-gray-200">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-bold text-gray-700">Needs &amp; Operations (50%)</span>
+                  <span id="splitNeeds" class="font-bold text-[#006A4E]">KES 50,000.00</span>
+                </div>
+                <div class="text-[10px] text-gray-500 font-sans">Designated for utilities, food rations, housing.</div>
+              </div>
+
+              <!-- 15% Emergency -->
+              <div class="p-2 rounded bg-emerald-50/70 border border-emerald-200">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-bold text-emerald-900">Emergency Vault (15%) [LOCKED]</span>
+                  <span id="splitEmergency" class="font-bold text-emerald-700">KES 15,000.00</span>
+                </div>
+                <div class="text-[10px] text-emerald-700 font-sans">Locked Sovereign Safety Reserve.</div>
+              </div>
+
+              <!-- 15% Investment -->
+              <div class="p-2 rounded bg-blue-50/70 border border-blue-200">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-bold text-blue-900">Capital Growth (15%)</span>
+                  <span id="splitInvestment" class="font-bold text-blue-700">KES 15,000.00</span>
+                </div>
+                <div class="text-[10px] text-blue-700 font-sans">Government securities, index funds, long-term assets.</div>
+              </div>
+
+              <!-- 20% Discretionary -->
+              <div class="p-2 rounded bg-amber-50/70 border border-amber-200">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-bold text-amber-900">Discretionary (20%)</span>
+                  <span id="splitDiscretionary" class="font-bold text-amber-700">KES 20,000.00</span>
+                </div>
+                <div class="text-[10px] text-amber-700 font-sans">Flexible quality of life, personal development.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-2 border-t border-gray-200 flex justify-between items-center text-xs font-mono">
+            <span class="text-gray-500 uppercase font-semibold">Total Verified Split:</span>
+            <span id="splitTotal" class="font-bold text-sm text-gray-900">KES 100,000.00 (100%)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Inflow Encounter Registry Table -->
+      <section class="bg-white border border-gray-300 rounded-sm p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <h3 class="text-sm font-bold uppercase tracking-tight text-gray-900 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[#006A4E] text-base">format_list_bulleted</span>
+              Form MOH-711 Historical Inflow Ledger
+            </h3>
+            <p class="text-xs text-gray-500">Official log of allocated remittances under national financial protocol.</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto border border-gray-300 rounded-sm">
+          <table class="emr-table" id="inflowTable">
+            <thead>
+              <tr>
+                <th style="width: 105px;">Date</th>
+                <th style="width: 130px;">Inflow Ref #</th>
+                <th>Remitter / Source</th>
+                <th style="width: 130px;">Payment Channel</th>
+                <th style="width: 120px;">Ref Code</th>
+                <th style="width: 130px; text-align: right;">Amount (KES)</th>
+                <th style="width: 100px; text-align: center;">Triage Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-mono text-gray-600">2026-11-04</td>
+                <td class="font-mono font-bold text-[#004F3A]">REC-2026-0189</td>
+                <td>
+                  <div class="font-semibold text-gray-900">Consultancy Retainer - Tech Labs East Africa</div>
+                  <div class="text-[10px] text-gray-500 font-mono">Primary Salary / Retainer</div>
+                </td>
+                <td class="font-mono text-gray-700">Bank RTGS / KCB</td>
+                <td class="font-mono text-gray-700">RTGS-KCB-9941</td>
+                <td class="font-mono font-bold text-right text-emerald-700">+ 150,000.00</td>
+                <td class="text-center">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    CLEARED
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-mono text-gray-600">2026-10-25</td>
+                <td class="font-mono font-bold text-[#004F3A]">REC-2026-0188</td>
+                <td>
+                  <div class="font-semibold text-gray-900">Kenya Infrastructure Bond Coupon</div>
+                  <div class="text-[10px] text-gray-500 font-mono">Treasury Bond Yield</div>
+                </td>
+                <td class="font-mono text-gray-700">M-PESA Paybill</td>
+                <td class="font-mono text-gray-700">QI881023MK</td>
+                <td class="font-mono font-bold text-right text-emerald-700">+ 48,000.00</td>
+                <td class="text-center">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    CLEARED
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const eat = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Africa/Nairobi',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      }).format(now);
+      const el = document.getElementById('liveTimestamp');
+      if (el) el.textContent = eat + ' EAT';
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function calculateTriageSplit(val) {
+      const num = parseFloat(val) || 0;
+      const needs = num * 0.50;
+      const emergency = num * 0.15;
+      const investment = num * 0.15;
+      const discretionary = num * 0.20;
+
+      document.getElementById('splitNeeds').textContent = 'KES ' + needs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('splitEmergency').textContent = 'KES ' + emergency.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('splitInvestment').textContent = 'KES ' + investment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('splitDiscretionary').textContent = 'KES ' + discretionary.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('splitTotal').textContent = 'KES ' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (100%)';
+    }
+
+    // Initialize with 100,000 default
+    calculateTriageSplit(100000);
+
+    function handleInflowSubmit(e) {
+      e.preventDefault();
+      const source = document.getElementById('sourceInput').value;
+      const cat = document.getElementById('categoryInput').value;
+      const channel = document.getElementById('channelInput').value;
+      const ref = document.getElementById('refInput').value;
+      const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+
+      const dateStr = new Date().toISOString().split('T')[0];
+      const voucherNum = 'REC-2026-0' + Math.floor(190 + Math.random() * 50);
+
+      const tableBody = document.querySelector('#inflowTable tbody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="font-mono text-gray-600">${dateStr}</td>
+        <td class="font-mono font-bold text-[#004F3A]">${voucherNum}</td>
+        <td>
+          <div class="font-semibold text-gray-900">${source}</div>
+          <div class="text-[10px] text-gray-500 font-mono">${cat}</div>
+        </td>
+        <td class="font-mono text-gray-700">${channel}</td>
+        <td class="font-mono text-gray-700">${ref}</td>
+        <td class="font-mono font-bold text-right text-emerald-700">+ ${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+        <td class="text-center">
+          <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+            CLEARED
+          </span>
+        </td>
+      `;
+      tableBody.insertBefore(tr, tableBody.firstChild);
+
+      alert(`Inflow of KES ${amount.toLocaleString()} successfully triaged under 50/15/15/20 Protocol!\nVoucher Reference: ${voucherNum}`);
+      document.getElementById('inflowForm').reset();
+      calculateTriageSplit(0);
+    }
+  </script>
+</body>
+</html>
