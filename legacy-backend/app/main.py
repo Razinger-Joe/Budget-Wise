@@ -5,7 +5,7 @@ from app.config import settings
 from app.core.logging import setup_logging
 
 @asynccontextmanager
-async lifespan(app: FastAPI):
+async def lifespan(app: FastAPI):
     # Startup logic
     setup_logging(settings.LOG_LEVEL)
     yield

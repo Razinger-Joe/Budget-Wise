@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -9,92 +9,183 @@ import {
   Vault,
   BarChart3,
   Wallet,
-  Zap,
-  Menu,
-  Bell,
   LogOut,
+  Bell,
+  ChevronRight,
+  User,
+  Settings,
+  HelpCircle,
+  Menu,
+  X,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/income", label: "Income", icon: TrendingUp },
-  { href: "/expenses", label: "Expenses", icon: Receipt },
-  { href: "/vaults", label: "Vaults", icon: Vault },
-  { href: "/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard, description: "Overview & scores" },
+  { href: "/income", label: "Income", icon: TrendingUp, description: "Track earnings" },
+  { href: "/expenses", label: "Expenses", icon: Receipt, description: "Monitor spending" },
+  { href: "/vaults", label: "Vaults", icon: Vault, description: "Manage buckets" },
+  { href: "/analytics", label: "Analytics", icon: BarChart3, description: "Trends & insights" },
 ];
 
-function SidebarContent({ pathname }: { pathname: string }) {
+const bottomItems = [
+  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/help", label: "Help & Support", icon: HelpCircle },
+];
+
+function NavLink({
+  item,
+  isActive,
+  onClick,
+}: {
+  item: (typeof navItems)[0];
+  isActive: boolean;
+  onClick?: () => void;
+}) {
+  const Icon = item.icon;
   return (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-2 mb-10">
-        <div className="w-10 h-10 rounded-xl bg-[var(--primary)] flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.25)] hover:scale-105 transition-transform">
+    <Link
+      href={item.href}
+      onClick={onClick}
+      className={`group flex items-center gap-3 px-4 py-3 mx-2 rounded-sm text-sm font-medium transition-all duration-150 relative ${
+        isActive
+          ? "bg-white/15 text-white"
+          : "text-white/60 hover:bg-white/8 hover:text-white/90"
+      }`}
+    >
+      {isActive && (
+        <span className="absolute left-0 top-2 bottom-2 w-0.5 bg-[#E8A020] rounded-r-full" />
+      )}
+      <div
+        className={`flex items-center justify-center w-8 h-8 rounded-sm transition-colors ${
+          isActive ? "bg-white/10" : "group-hover:bg-white/5"
+        }`}
+      >
+        <Icon className="h-[18px] w-[18px]" />
+      </div>
+      <span className="flex-1 font-medium">{item.label}</span>
+      {isActive && <ChevronRight className="h-3.5 w-3.5 text-white/40" />}
+    </Link>
+  );
+}
+
+function SidebarContent({
+  pathname,
+  onClose,
+}: {
+  pathname: string;
+  onClose?: () => void;
+}) {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    router.push("/login");
+  };
+
+  return (
+    <div className="flex flex-col h-full" style={{ background: "var(--sidebar)" }}>
+      {/* Logo / Brand */}
+      <div
+        className="flex items-center gap-3 px-6 py-5 border-b shrink-0"
+        style={{ borderColor: "var(--sidebar-border)" }}
+      >
+        <div
+          className="w-9 h-9 rounded-sm flex items-center justify-center shrink-0"
+          style={{ background: "var(--accent)" }}
+        >
           <Wallet className="h-5 w-5 text-white" />
         </div>
-        <div>
-          <h1 className="font-display font-extrabold text-lg tracking-tight leading-none text-foreground">
+        <div className="flex-1 min-w-0">
+          <h1
+            className="font-display font-bold text-base leading-tight text-white truncate"
+          >
             Budget-Wise
           </h1>
-          <p className="text-[10px] uppercase tracking-widest text-[var(--primary)] font-bold opacity-80">
-            Smart Finance
+          <p className="text-[10px] font-medium mt-0.5" style={{ color: "var(--sidebar-muted)" }}>
+            Smart Finance Platform
           </p>
         </div>
+        {onClose && (
+          <button onClick={onClose} className="text-white/40 hover:text-white lg:hidden">
+            <X className="h-5 w-5" />
+          </button>
+        )}
       </div>
 
-      {/* Nav links */}
-      <nav className="flex-1 space-y-1.5">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
+      {/* Nav section label */}
+      <div className="px-6 pt-5 pb-2">
+        <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--sidebar-muted)" }}>
+          Main Menu
+        </p>
+      </div>
+
+      {/* Nav items */}
+      <nav className="flex-1 overflow-y-auto space-y-0.5 sidebar-scroll pb-4">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.href}
+            item={item}
+            isActive={pathname === item.href}
+            onClick={onClose}
+          />
+        ))}
+
+        <div
+          className="mx-6 my-4 border-t"
+          style={{ borderColor: "var(--sidebar-border)" }}
+        />
+
+        <div className="px-6 pb-2">
+          <p className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: "var(--sidebar-muted)" }}>
+            System
+          </p>
+        </div>
+
+        {bottomItems.map((item) => {
           const Icon = item.icon;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                isActive
-                  ? "bg-[var(--primary)]/10 text-[var(--primary)] border border-[var(--primary)]/20 shadow-sm"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
-              }`}
+              className="flex items-center gap-3 px-4 py-2.5 mx-2 rounded-sm text-sm text-white/50 hover:bg-white/8 hover:text-white/80 transition-all"
+              onClick={onClose}
             >
-              <Icon
-                className={`h-[18px] w-[18px] transition-transform ${
-                  !isActive && "group-hover:scale-110"
-                }`}
-              />
-              <span className="text-sm font-semibold">{item.label}</span>
+              <Icon className="h-4 w-4 ml-1" />
+              <span>{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      <Separator className="my-4" />
-
-      {/* Bottom card */}
-      <div className="space-y-4">
-        <div className="rounded-2xl p-4 border border-[var(--primary)]/15 bg-gradient-to-br from-[var(--primary)]/5 to-transparent relative overflow-hidden group hover:border-[var(--primary)]/30 transition-colors cursor-pointer">
-          <div className="absolute -right-2 -top-2 w-16 h-16 bg-[var(--primary)]/10 blur-2xl group-hover:bg-[var(--primary)]/20 transition-all duration-500" />
-          <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wider">
-            Current Tier
-          </p>
-          <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-[var(--primary)] drop-shadow-[0_0_6px_rgba(37,99,235,0.4)]" />
-            <span className="font-bold text-sm text-foreground">
-              Sapphire Pro
-            </span>
+      {/* User card at bottom */}
+      <div
+        className="shrink-0 mx-3 mb-4 p-3 rounded-sm"
+        style={{ background: "rgba(0,0,0,0.2)", border: "1px solid var(--sidebar-border)" }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-8 h-8 rounded-sm flex items-center justify-center text-xs font-bold text-white shrink-0"
+            style={{ background: "var(--accent)" }}
+          >
+            BW
           </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-white truncate">Budget-Wise User</p>
+            <p className="text-[10px] truncate" style={{ color: "var(--sidebar-muted)" }}>
+              Nairobi, Kenya
+            </p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="p-1.5 rounded-sm hover:bg-white/10 transition-colors"
+            title="Sign out"
+            style={{ color: "var(--sidebar-muted)" }}
+          >
+            <LogOut className="h-3.5 w-3.5" />
+          </button>
         </div>
-        <Button className="w-full bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white font-bold py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.15)] hover:shadow-[0_0_25px_rgba(37,99,235,0.3)]">
-          <Zap className="h-4 w-4 mr-2" />
-          <span className="text-sm uppercase tracking-tight">
-            Upgrade to Pro
-          </span>
-        </Button>
       </div>
     </div>
   );
@@ -107,84 +198,116 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [notifCount] = useState(2);
 
   // Don't use this layout for auth pages
   if (pathname === "/login" || pathname === "/register") {
     return <>{children}</>;
   }
 
+  const currentPage = navItems.find((n) => n.href === pathname);
+
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden" style={{ background: "var(--background)" }}>
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-72 h-full flex-col border-r border-border/60 bg-card/80 backdrop-blur-sm p-6 shrink-0 z-20">
+      <aside
+        className="hidden lg:flex flex-col shrink-0 z-20"
+        style={{ width: "var(--sidebar-width)" }}
+      >
         <SidebarContent pathname={pathname} />
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="flex items-center justify-between px-6 lg:px-10 py-5 bg-card/80 backdrop-blur-sm border-b border-border/60 shrink-0 z-10">
-          <div className="flex items-center gap-4">
-            {/* Mobile menu */}
-            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-              <SheetTrigger>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="lg:hidden"
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-72 p-6">
-                <SidebarContent pathname={pathname} />
-              </SheetContent>
-            </Sheet>
+      {/* Mobile Sidebar */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 lg:hidden transition-transform duration-300 ease-out ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+        style={{ width: "var(--sidebar-width)" }}
+      >
+        <SidebarContent pathname={pathname} onClose={() => setMobileOpen(false)} />
+      </aside>
 
-            <div>
-              <h2 className="font-display text-2xl lg:text-3xl font-extrabold tracking-tight text-foreground">
-                {navItems.find((n) => n.href === pathname)?.label || "Dashboard"}
-              </h2>
-              <p className="text-muted-foreground text-sm mt-0.5">
-                Welcome back, your financial sanctuary is ready.
-              </p>
+      {/* Main Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Header — Carbon-style */}
+        <header
+          className="shrink-0 flex items-center justify-between px-6 lg:px-8 border-b bg-white z-10"
+          style={{ borderColor: "var(--border)", height: "56px" }}
+        >
+          {/* Left: Mobile menu + Breadcrumb */}
+          <div className="flex items-center gap-4">
+            <button
+              className="lg:hidden p-1.5 rounded-sm hover:bg-muted transition-colors"
+              onClick={() => setMobileOpen(true)}
+            >
+              <Menu className="h-5 w-5 text-foreground" />
+            </button>
+
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground font-medium">Budget-Wise</span>
+              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="font-semibold text-foreground">
+                {currentPage?.label || "Dashboard"}
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full hover:bg-accent"
-            >
+          {/* Right: Notifications + User */}
+          <div className="flex items-center gap-2">
+            {/* Notification button */}
+            <button className="relative p-2 rounded-sm hover:bg-muted transition-colors">
               <Bell className="h-[18px] w-[18px] text-muted-foreground" />
-            </Button>
-            <div className="w-px h-6 bg-border" />
-            <div className="flex items-center gap-3 cursor-pointer group">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold leading-none group-hover:text-[var(--primary)] transition-colors">
-                  Alex Mbuthia
-                </p>
-                <p className="text-xs text-[var(--primary)] font-medium mt-1">
-                  Nairobi, KE
-                </p>
+              {notifCount > 0 && <span className="notif-badge" />}
+            </button>
+
+            {/* Divider */}
+            <div className="w-px h-5 bg-border mx-1" />
+
+            {/* User button */}
+            <button className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-sm hover:bg-muted transition-colors">
+              <div
+                className="w-7 h-7 rounded-sm flex items-center justify-center text-xs font-bold text-white shrink-0"
+                style={{ background: "var(--primary)" }}
+              >
+                BW
               </div>
-              <Avatar className="h-10 w-10 border-2 border-[var(--primary)]/20 group-hover:border-[var(--primary)]/50 transition-all">
-                <AvatarFallback className="bg-[var(--primary)]/10 text-[var(--primary)] font-bold">
-                  AM
-                </AvatarFallback>
-              </Avatar>
-            </div>
+              <div className="text-left hidden sm:block">
+                <p className="text-xs font-semibold text-foreground leading-tight">My Account</p>
+                <p className="text-[10px] text-muted-foreground leading-tight">Nairobi, KE</p>
+              </div>
+            </button>
           </div>
         </header>
 
+        {/* Page title bar — Carbon-style */}
+        <div
+          className="shrink-0 px-6 lg:px-8 py-4 bg-white border-b"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <h2 className="text-xl font-bold text-foreground leading-tight">
+            {currentPage?.label || "Dashboard"}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {currentPage?.description || "Financial overview and metrics"}
+          </p>
+        </div>
+
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="px-6 lg:px-10 py-8 max-w-7xl mx-auto space-y-8">
+        <main className="flex-1 overflow-y-auto">
+          <div className="px-6 lg:px-8 py-6 max-w-screen-xl mx-auto space-y-6">
             {children}
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
